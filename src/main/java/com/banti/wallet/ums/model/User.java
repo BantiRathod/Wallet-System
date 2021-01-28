@@ -1,5 +1,6 @@
 package com.banti.wallet.ums.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,7 +9,9 @@ import javax.persistence.Id;
 @Entity
 public class User{
 	@Id
-	private Integer id;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name="user_id")
+	private Long userId;
 	private String userName;
 	private String fname;
 	private String lname;
@@ -20,28 +23,14 @@ public class User{
 	public User()
 	{}
 	
-	public User(Integer id,String userName, String fname, String lname, 
-		String add1, String add2, String email, String mobileNo) {
-		this.userName = userName;
-		this.fname = fname;
-		this.lname = lname;
-		this.id=id;
-		this.add1 = add1;
-		this.add2 = add2;
-		this.email = email;
-		this.mobileNo = mobileNo;
-	}
-	
-	@Id
-	@GeneratedValue (strategy = GenerationType.AUTO)
-	public Integer getId(){
-		return id;
+	public Long getUserId() {
+		return userId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
-	
+
 	public String getUserName() {
 		return userName;
 	}
@@ -78,11 +67,20 @@ public class User{
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
 	public String getMobileNo() {
 		return mobileNo;
 	}
 	public void setMobileNo(String mobileNo) {
 		this.mobileNo = mobileNo;
 	}
+
+	@Override
+	public String toString() {
+		return "User [userName=" + userName + ", fname=" + fname + ", lname=" + lname + ", add1=" + add1 + ", add2="
+				+ add2 + ", email=" + email + ", mobileNo=" + mobileNo + "]";
+	}
+	
+	
 	
 }

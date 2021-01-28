@@ -47,7 +47,7 @@ public class TransactionController {
 	{
 		try
 		{
-			String status = ts.getTrans(id).getStatus();
+			String status = ts.getTransaction(id).getStatus();
 			return new ResponseEntity<String>(status,HttpStatus.OK);
 		}
 		catch(NoSuchElementException e)
@@ -65,8 +65,7 @@ public class TransactionController {
 		Double balance=payerWallet.getBalance();
 		if(balance >= transaction.getAmount())              // amount should not exceed 
 		{
-		      balance-=transaction.getAmount(); 
-		      //money is being deducted  
+		      balance-=transaction.getAmount();                                              //money is being deducted  
 		      payerWallet.setBalance(balance); 
 		      
  		      balance=payeeWallet.getBalance();
@@ -84,7 +83,7 @@ public class TransactionController {
 			 transaction.setStatus("failed : please check your balance");
 		}
 		
-		ts.createTrans(transaction); 
+		ts.createTransaction(transaction); 
 		
 	}
 }

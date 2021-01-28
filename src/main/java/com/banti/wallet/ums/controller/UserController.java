@@ -1,5 +1,7 @@
 package com.banti.wallet.ums.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +18,11 @@ import java.util.NoSuchElementException;
 @RestController                        //work at server side and remove view part
 public class UserController 
 {
+	Logger logger=LoggerFactory.getLogger(UserController.class);
 	 @Autowired                        //inject object of a class annotations    
 	    private UserService service;   //injecting variable of service class(at service layer)
 	 
-	                          //RESTful API for get Operation
+	                                  //RESTful API for get Operation
 	 @GetMapping("/users")
 	 public List<User> list()
 	 {
@@ -28,7 +31,7 @@ public class UserController
 	 
 	//RESTful API for retrieve Operation
 	 @GetMapping("/users/{id}")
-	 public ResponseEntity<User> get(@PathVariable Integer id) {
+	 public ResponseEntity<User> get(@PathVariable Long id) {
 	     try {
 	         User user = service.get(id);
 	         return new ResponseEntity<User> (user, HttpStatus.OK);
@@ -40,12 +43,13 @@ public class UserController
 	 //RESTful API for Create Operation
 	 @PostMapping("/users")
 	 public void add(@RequestBody User user) {
-	     service.save(user);
+	     logger.info("request received to save the user {}",user);
+		 service.save(user);
 	 }
 	 
 	// RESTful API for Update Operation
 	 @PutMapping("/users/{id}")
-	 public ResponseEntity<?> update(@RequestBody User user, @PathVariable Integer id) {
+	 public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
 	     try {
 	         User existUser = service.get(id);
 	         existUser.setUserName(user.getUserName());
@@ -64,7 +68,7 @@ public class UserController
 	
 	// RESTful API for Delete Operation
 	 @DeleteMapping("/users/{id}")
-	 public void delete(@PathVariable Integer id) {
+	 public void delete(@PathVariable Long id) {
 	       service.delete(id);
 	 }
 }

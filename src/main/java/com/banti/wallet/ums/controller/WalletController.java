@@ -1,5 +1,6 @@
 package com.banti.wallet.ums.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,11 +49,12 @@ public class WalletController {
 		}	
 	 }
 	 
-	@PostMapping("/wallet/create")
+	@PostMapping("/wallet")
 	public String createWallet(@RequestBody Wallet wallet)
       {
+		wallet.setCreatedDate(new Date());
 		walletService.create(wallet);
-		return "new user wallet of "+wallet.getMobileNo()+" on "+wallet.getCreatedDate()+"has heen created";
+		return "new user wallet of "+wallet.getMobileNo()+" on "+ wallet.getCreatedDate() +" has heen created";
       }
 	
 	/*@PutMapping("/wallet/status/{mobileNo}")

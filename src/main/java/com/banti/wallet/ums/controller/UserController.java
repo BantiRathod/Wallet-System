@@ -57,8 +57,8 @@ public class UserController
 	         User existUser = userService.get(id);
 	         existUser.setUserName(user.getUserName());
 	         existUser.setEmail(user.getEmail());                          
-	         existUser.setFname(user.getFname());                       
-	         existUser.setLname(user.getLname());                          
+	         existUser.setFirstName(user.getFirstName());                       
+	         existUser.setLastName(user.getLastName());                          
 	         existUser.setAddress(user.getAddress());
 	         existUser.setStatus(user.getStatus());
 	         existUser.setMobileNo(user.getMobileNo());

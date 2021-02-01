@@ -34,7 +34,7 @@ public class MerchantWalletController
 		}	
 	}
 	
-	@GetMapping("/merchantWallet/get/{mobileNo}")
+	@GetMapping("/merchantWallet/{mobileNo}")
 	 public ResponseEntity<MerchantWallet> fatchWallet(@PathVariable String mobileNo)
 	 {
 		try
@@ -48,7 +48,7 @@ public class MerchantWalletController
 		}	
 	 }
 	 
-	@PostMapping("/wallet")
+	@PostMapping("/merchantWallet")
 	public String createWallet(@RequestBody MerchantWallet merchantWallet)
       {
 		merchantWalletService.createOrUpdate(merchantWallet);

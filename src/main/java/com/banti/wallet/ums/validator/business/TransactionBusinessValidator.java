@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.banti.wallet.ums.constant.ContextConstant;
 import com.banti.wallet.ums.controller.TransactionRequest;
 import com.banti.wallet.ums.enums.AccountStatus;
+import com.banti.wallet.ums.enums.PersonStatus;
 import com.banti.wallet.ums.model.Bank;
 import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.model.MerchantWallet;
@@ -40,7 +41,7 @@ public class TransactionBusinessValidator {
 		
 		if(user==null) {
 			throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
-		}else if("UNACTIVE".equalsIgnoreCase(user.getStatus())) {
+		}else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(user.getStatus())) {
 			throw new Exception("user account is not active");
 		}
 		
@@ -51,7 +52,7 @@ public class TransactionBusinessValidator {
 		
 		if(merchant==null)  {
 			 throw new Exception("merchant account not exist in system with mobile number "+request.getPayeeMobileNo());
-		}else if("UNACTIVE".equalsIgnoreCase(merchant.getStatus()))
+		}else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(merchant.getStatus()))
 			 throw new Exception("merchant account is not active in system with mobile number "+request.getPayeeMobileNo());
 		
 		p2mContext.put(ContextConstant.MERCHANT_ACCOUNT, merchant);
@@ -82,7 +83,7 @@ public class TransactionBusinessValidator {
 		
 		if(payerUser==null) 
 			throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
-		else if("UNACTIVE".equalsIgnoreCase(payerUser.getStatus()))
+		else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payerUser.getStatus()))
 			throw new Exception("user account is not active");
 		
 		//p2pContext.put(ContextConstant.USER_ACCOUNT,payerUser );
@@ -93,7 +94,7 @@ public class TransactionBusinessValidator {
 		
 		if(payeeUser==null)  
 			 throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());
-		else if("UNACTIVE".equalsIgnoreCase(payeeUser.getStatus()))
+		else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payeeUser.getStatus()))
 			 throw new Exception("user account is not active");
 		
 		//p2pContext.put(ContextConstant.USER_ACCOUNT, payeeUser);
@@ -124,7 +125,7 @@ public class TransactionBusinessValidator {
 	User user = userService.findByMobileNo(request.getPayerMobileNo());
 	if(user==null) 
 		throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
-	else if("UNACTIVE".equalsIgnoreCase(user.getStatus()))
+	else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(user.getStatus()))
 		throw new Exception("user account is not active");
 	addMoneyContext.put(ContextConstant.USER_ACCOUNT, user);
 	

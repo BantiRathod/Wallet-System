@@ -128,7 +128,8 @@ public class TransactionController {
 			Map<String, Object> p2mContext, WalletTransaction tempTransaction) {
 		User payerUser = (User) p2mContext.get(ContextConstant.USER_ACCOUNT);
 		Merchant payeeMerchant = (Merchant) p2mContext.get(ContextConstant.MERCHANT_ACCOUNT);
-
+		
+		transactionResponse.setTransactionType(TxnType.P2M.name());
 		transactionResponse.setPayerName(payerUser.getFname());
 		transactionResponse.setPayeeName(payeeMerchant.getShopName());
 		transactionResponse.setMessage("Transaction Successful");
@@ -142,6 +143,7 @@ public class TransactionController {
 		transaction.setPayeeMobileNo(request.getPayeeMobileNo());
 		transaction.setPayerMobileNo(request.getPayerMobileNo());
 		transaction.setAmount(request.getAmount());
+		transaction.setOrderId(request.getOrderId());
 		transaction.setTransactionType(TxnType.P2M.name());
 		transaction.setTransactionDate(new Date());
 		WalletTransaction tempTransaction = transactionService.saveTransaction(transaction);
@@ -215,6 +217,7 @@ public class TransactionController {
 			transactionResponse.setPayeeName(payeeUser.getFname());
 			transactionResponse.setMessage("Transaction Successful");
 			transactionResponse.setDate(new Date());
+			transactionResponse.setTransactionType(TxnType.P2P.name());
 			transactionResponse.setId(tempTransaction.getId());
 			transactionResponse.setOrderId(request.getOrderId());
 		}
@@ -224,6 +227,7 @@ public class TransactionController {
 			transaction.setPayeeMobileNo(request.getPayeeMobileNo());
 			transaction.setPayerMobileNo(request.getPayerMobileNo());
 			transaction.setAmount(request.getAmount());
+			transaction.setOrderId(request.getOrderId());
 			transaction.setTransactionType(TxnType.P2P.name());
 			transaction.setTransactionDate(new Date());
 			WalletTransaction tempTransaction = transactionService.saveTransaction(transaction);
@@ -369,12 +373,14 @@ public class TransactionController {
 		transactionResponse.setPayeeName(user.getFname());
 		transactionResponse.setMessage("Transaction Successful");
 		transactionResponse.setDate(new Date());
+		transactionResponse.setTransactionType(TxnType.ADD_MONEY.name());
 		transactionResponse.setId(tempTransaction.getId());
 		transactionResponse.setOrderId(request.getOrderId());
 	}
 
 	private WalletTransaction createTransactionForAddMoney(TransactionRequest request, WalletTransaction transaction) {
 		transaction.setStatus(" Money added succesfully");
+		transaction.setOrderId(request.getOrderId());
 		transaction.setPayeeMobileNo(request.getPayeeMobileNo());
 		transaction.setPayerMobileNo(request.getPayerMobileNo());
 		transaction.setAmount(request.getAmount());

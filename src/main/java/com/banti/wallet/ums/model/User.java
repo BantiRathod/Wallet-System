@@ -1,7 +1,6 @@
 package com.banti.wallet.ums.model;
-import java.util.Date;
 
-import javax.persistence.Column;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -79,6 +78,5 @@ public class User{
 		return "User [userId=" + userId + ", userName=" + userName + ", fname=" + fname + ", lname=" + lname
 				+ ", address=" + address + ", registerDate=" + registerDate + ", email=" + email + ", mobileNo="
 				+ mobileNo + ", status=" + status + "]";
-	}
-	
+	}	
 }

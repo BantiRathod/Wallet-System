@@ -14,8 +14,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepo;
     
-    public User findByMobileNo(String request) {
-       return userRepo.findByMobileNo(request);
+    public User findByMobileNo(String mobileNo) {
+       return userRepo.findByMobileNo(mobileNo);
     }
     
     public List<User> listAll() {

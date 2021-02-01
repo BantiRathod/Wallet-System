@@ -8,6 +8,6 @@ import com.banti.wallet.ums.model.User;
 
 public interface UserRepository extends JpaRepository<User,Long>
 {
-    @Query("select u from User u where u.mobileNo= :mobileNo ")
-	User findByMobileNo(@Param("mobileNo")String mobileNo);
+    @Query("select u from User u where u.mobileNo = :mobileNo ")
+	User findByMobileNo(@Param("mobileNo") String mobileNo);
 }

@@ -55,14 +55,14 @@ public class UserController
 	 public ResponseEntity<String> update(@RequestBody User user, @PathVariable Long id) {
 	     try{
 	         User existUser = userService.get(id);
-	       //  existUser.setUserName(user.getUserName());
+	         existUser.setUserName(user.getUserName());
 	         existUser.setEmail(user.getEmail());                          
 	         existUser.setFname(user.getFname());                       
 	         existUser.setLname(user.getLname());                          
 	         existUser.setAddress(user.getAddress());
 	         existUser.setStatus(user.getStatus());
 	         existUser.setMobileNo(user.getMobileNo());
-	       //  existUser.setRegisterDate(user.getRegisterDate());
+	         //existUser.setRegisterDate(user.getRegisterDate());
 	         userService.save(existUser);
 	         return new ResponseEntity<String>(" Record of the given id's user has been updated ",HttpStatus.OK);
 	     } catch (NoSuchElementException e) {

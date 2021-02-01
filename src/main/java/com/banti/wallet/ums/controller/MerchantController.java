@@ -1,8 +1,11 @@
 package com.banti.wallet.ums.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,8 @@ import com.banti.wallet.ums.service.MerchantService;
 
 @RestController
 public class MerchantController {
+
+	Logger logger=LoggerFactory.getLogger(TransactionController.class);
 
 @Autowired
 private MerchantService merchantService;
@@ -40,6 +45,7 @@ public ResponseEntity<List<Merchant>> listAll()
 @GetMapping("/merchant/{id}")
  public ResponseEntity<Merchant> fatchWallet(@PathVariable Long id)
  {
+	
 	try
 	{
        Merchant merchant = merchantService.get(id);
@@ -51,10 +57,12 @@ public ResponseEntity<List<Merchant>> listAll()
 	}	
  }
  
-@PostMapping("/merchant/create")
+@PostMapping("/merchant")
 public String createMerchantAccount(@RequestBody Merchant merchant )
   {
+	logger.info("merchant recieved {} ", merchant);
+	 merchant.setRegisterDate(new Date());
 	 merchantService.createOrUpdate(merchant);
-	 return " new merchant account has been created has heen created ";
+	 return " new merchant account has been created ";
   }
 }

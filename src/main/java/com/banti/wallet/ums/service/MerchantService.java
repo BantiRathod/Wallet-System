@@ -31,7 +31,7 @@ public class MerchantService
 	 }
 
 	public Merchant findByMobileNo(String payeeMobileNo) {
-		return findByMobileNo(payeeMobileNo);
+		return merchantRepository.findByMobileNo(payeeMobileNo);
 	}	
 	 
    

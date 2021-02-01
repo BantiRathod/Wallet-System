@@ -22,11 +22,9 @@ import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.Bank;
 import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.model.MerchantWallet;
-import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.model.User;
 import com.banti.wallet.ums.model.Wallet;
-//import com.banti.wallet.ums.repository.MerchantRepository;
-
+import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.service.BankService;
 import com.banti.wallet.ums.service.MerchantWalletService;
 import com.banti.wallet.ums.service.TransactionService;
@@ -225,7 +223,7 @@ public class TransactionController {
 		transaction.setPayeeMobileNo(ptopTransaction.getPayeeMobileNo());
 		transaction.setPayerMobileNo(ptopTransaction.getPayerMobileNo());
 		transaction.setAmount(ptopTransaction.getAmount());
-		transaction.setTransactionType("PtoP");
+		transaction.setTransactionType(TxnType.P2P.name());
 		transaction.setTransactionDate(new Date());
 
 		WalletTransaction currentTransaction = transactionService.createTransaction(transaction);
@@ -294,7 +292,7 @@ public class TransactionController {
 		transaction.setPayeeMobileNo(addMoneyTransaction.getPayeeMobileNo());
 		transaction.setPayerMobileNo(addMoneyTransaction.getPayerMobileNo());
 		transaction.setAmount(addMoneyTransaction.getAmount());
-		transaction.setTransactionType("PtoP");
+		transaction.setTransactionType(TxnType.P2P.name());
 		transaction.setTransactionDate(new Date());
 		transaction.setOrderId(addMoneyTransaction.getOrderId());
 		WalletTransaction tempTransaction = transactionService.createTransaction(transaction);

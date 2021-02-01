@@ -117,10 +117,10 @@ public class TransactionController {
 			transactionResponse.setOrderId(request.getOrderId());
 			transactionResponse.setMessage(e.getMessage());
 			transactionResponse.setDate(new Date());
-			logger.info("p2m transaction received {}", request);
+			logger.info("p2m transaction transactionResponse {}",transactionResponse );
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 		}
-		logger.info("p2m transaction received {}", request);
+		logger.info("p2m transaction transactionResponse {}", transactionResponse);
 		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 	}
 
@@ -176,7 +176,7 @@ public class TransactionController {
 	}
 	
 	// API FOR SENDING MONEY TO A PERSON
-	@PostMapping("/Transaction/P2P")
+	@PostMapping("/transaction/P2P")
 	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest request) 
 	{
 		logger.info("p2p transaction received {}",request);
@@ -201,10 +201,10 @@ public class TransactionController {
 				transactionResponse.setOrderId(request.getOrderId());
 				transactionResponse.setMessage(e.getMessage());
 				transactionResponse.setDate(new Date());
-				logger.info("p2m transaction received {}",transactionResponse);
+				logger.info("p2m transaction transactionResponse {}",transactionResponse);
 				return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 			}
-			logger.info("p2m transaction received {}",transactionResponse );
+			logger.info("p2m transaction transactionResponse {}",transactionResponse );
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 		}
 
@@ -332,7 +332,7 @@ public class TransactionController {
 		
 		
 	 // API FOR ADDINGMONEY IN WALLET FROM BANK
-	@PostMapping("Transaction/addMoney")
+	@PostMapping("transaction/addMoney")
 	public ResponseEntity<TransactionResponse> addMoney(@RequestBody TransactionRequest request) {
 		logger.info("addMoney transaction received {}",request);
 		
@@ -360,7 +360,7 @@ public class TransactionController {
 			logger.info("addMoney transaction responded {}",transactionResponse);
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 		}
-		logger.info("addMoney transaction received {}",transactionResponse);
+		logger.info("addMoney transaction transactionResponse {}",transactionResponse);
 		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 	}
 

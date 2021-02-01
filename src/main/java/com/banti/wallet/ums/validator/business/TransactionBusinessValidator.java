@@ -1,70 +1,143 @@
 package com.banti.wallet.ums.validator.business;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import com.banti.wallet.ums.constant.ContextConstant;
 import com.banti.wallet.ums.controller.TransactionRequest;
-import com.banti.wallet.ums.controller.TransactionResponse;
 import com.banti.wallet.ums.enums.AccountStatus;
+import com.banti.wallet.ums.model.Bank;
 import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.User;
 import com.banti.wallet.ums.model.Wallet;
-import com.banti.wallet.ums.repository.MerchantRepository;
-import com.banti.wallet.ums.repository.MerchantWalletRepository;
-import com.banti.wallet.ums.repository.UserRepository;
+import com.banti.wallet.ums.service.MerchantService;
 import com.banti.wallet.ums.service.MerchantWalletService;
+import com.banti.wallet.ums.service.UserService;
 import com.banti.wallet.ums.service.WalletService;
 
 
 @Service
 public class TransactionBusinessValidator {
 	@Autowired
-	private WalletService walletService;
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private MerchantRepository merchantRepository;
+	private UserService userService;
+	@Autowired MerchantService merchantService;
 	@Autowired
 	private MerchantWalletService merchantWalletService;
-	
-	
+	@Autowired
+	private WalletService userWalletService;
+
 	
 	
 	public void p2mValidation(TransactionRequest request, Map<String, Object> p2mContext) throws Exception {
 		// check user exist
-		User user = userRepository.findByMobileNo(request.getPayerMobileNo());
+		
+		User user = userService.findByMobileNo(request.getPayerMobileNo());
+		
 		if(user==null) {
 			throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
-		}else if(!user.getStatus().equalsIgnoreCase("ACTIVE")) {
+		}else if("UNACTIVE".equalsIgnoreCase(user.getStatus())) {
 			throw new Exception("user account is not active");
 		}
+		
 		p2mContext.put(ContextConstant.USER_ACCOUNT, user);
 		
-		Merchant merchant = merchantRepository.findByMobileNo(request.getPayeeMobileNo());
-		if(merchant==null) {
-			throw new Exception("merchant account not exist in system with mobile number "+request.getPayeeMobileNo());
-		}
+		// CHECK MERCHANT EXIST OR NOT
+		Merchant merchant = merchantService.findByMobileNo(request.getPayeeMobileNo());
+		
+		if(merchant==null)  {
+			 throw new Exception("merchant account not exist in system with mobile number "+request.getPayeeMobileNo());
+		}else if("UNACTIVE".equalsIgnoreCase(merchant.getStatus()))
+			 throw new Exception("merchant account is not active in system with mobile number "+request.getPayeeMobileNo());
+		
 		p2mContext.put(ContextConstant.MERCHANT_ACCOUNT, merchant);
 		
-		//check user has sufficient amt
-		Wallet userWallet = walletService.get(request.getPayeeMobileNo());
-		if(userWallet.getBalance()<request.getAmount()) {
-			throw new Exception(String.format("user does not have sufficient balance, current balance;%d, request txnAmt: %d",userWallet.getBalance(),request.getAmount()));
-		}		
-		p2mContext.put(ContextConstant.USER_WALLET, userWallet);
-		
+		//check user and merchant wallet is active or not
 		MerchantWallet payeeMerchantWallet = merchantWalletService.get(request.getPayeeMobileNo());
+		Wallet payerUserWallet = userWalletService.get(request.getPayerMobileNo());
+		
 		if (AccountStatus.DISABLED.name().equalsIgnoreCase(payeeMerchantWallet.getStatus())) {
-			throw new Exception("merchant is not active");
-		}
+			     throw new Exception("merchant wallet is not active");
+		}else if(AccountStatus.DISABLED.name().equalsIgnoreCase(payerUserWallet.getStatus()))
+			 throw new Exception("user wallet is not active");
 		p2mContext.put(ContextConstant.MERCHANT_WALLET, payeeMerchantWallet);
+		
+		//check user has sufficient amount
+		 payerUserWallet = userWalletService.get(request.getPayerMobileNo());
+		if(payerUserWallet.getBalance()<request.getAmount()) {
+			throw new Exception(String.format("user does not have sufficient balance, current balance: %d, request txnAmt: %d",payerUserWallet.getBalance(),request.getAmount()));
+		}		
+		p2mContext.put(ContextConstant.USER_WALLET, payerUserWallet);
 	}
 
+	
+	public void p2pValidation(TransactionRequest request, Map<String, Object> p2pContext) throws Exception {
+		// check  payer user exist or not
+		
+		User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
+		
+		if(payerUser==null) {
+			throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
+		}else if("UNACTIVE".equalsIgnoreCase(payerUser.getStatus())) {
+			throw new Exception("user account is not active");
+		}
+		
+		p2pContext.put(ContextConstant.USER_ACCOUNT,payerUser );
+		
+		// CHECK payee user EXIST OR NOT
+		
+		User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
+		
+		if(payeeUser==null)  {
+			 throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());
+		}else if("UNACTIVE".equalsIgnoreCase(payeeUser.getStatus()))
+			 throw new Exception("user account is not active");
+		
+		p2pContext.put(ContextConstant.USER_ACCOUNT, payeeUser);
+		
+		//check user and merchant wallet is active or not
+		Wallet payeeUsertWallet = userWalletService.get(request.getPayeeMobileNo());
+		Wallet payerUserWallet = userWalletService.get(request.getPayerMobileNo());
+		
+		if (AccountStatus.DISABLED.name().equalsIgnoreCase(payeeUsertWallet.getStatus())) {
+			     throw new Exception("payee User wallet is not active");
+		}else if(AccountStatus.DISABLED.name().equalsIgnoreCase(payerUserWallet.getStatus()))
+			 throw new Exception("payer User wallet is not active");
+		p2pContext.put(ContextConstant.USER_WALLET, payeeUsertWallet);
+		
+		//check user has sufficient amount
+		if(payerUserWallet.getBalance()<request.getAmount()) {
+			throw new Exception(String.format("user does not have sufficient balance, current balance: %d, request txnAmt: %d",payerUserWallet.getBalance(),request.getAmount()));
+		}		
+		p2pContext.put(ContextConstant.USER_WALLET, payerUserWallet);
+		
+	}
+
+  // check request parameter for addMoney api
+  public void addMoneyValidation(TransactionRequest request,Bank bank , Map<String, Object> addMoneyContext) throws Exception {
+	// check  payer user exist or not
+	
+	User user = userService.findByMobileNo(request.getPayerMobileNo());
+	
+	if(user==null) {
+		throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
+	}else if("UNACTIVE".equalsIgnoreCase(user.getStatus())) {
+		throw new Exception("user account is not active");
+	}
+	
+	addMoneyContext.put(ContextConstant.USER_ACCOUNT, user);
+	addMoneyContext.put(ContextConstant.BANK, bank);
+	//check user and merchant wallet is active or not
+	Wallet payerUserWallet = userWalletService.get(request.getPayerMobileNo());
+	
+	 if(AccountStatus.DISABLED.name().equalsIgnoreCase(payerUserWallet.getStatus()))
+		    throw new Exception("payer User wallet is not active");
+    addMoneyContext.put(ContextConstant.USER_WALLET, payerUserWallet);
+	
+	//check user has sufficient amount
+	if(payerUserWallet.getBalance()<request.getAmount()) 
+		throw new Exception(String.format("user does not have sufficient balance, current balance: %d, request txnAmt: %d",payerUserWallet.getBalance(),request.getAmount()));
+	}			
 }
+

@@ -22,7 +22,7 @@ import com.banti.wallet.ums.service.MerchantService;
 @RestController
 public class MerchantController {
 
-	Logger logger=LoggerFactory.getLogger(TransactionController.class);
+	Logger logger=LoggerFactory.getLogger(MerchantController.class);
 
 @Autowired
 private MerchantService merchantService;
@@ -63,6 +63,6 @@ public String createMerchantAccount(@RequestBody Merchant merchant )
 	logger.info("merchant recieved {} ", merchant);
 	 merchant.setRegisterDate(new Date());
 	 merchantService.createOrUpdate(merchant);
-	 return " new merchant account has been created ";
+	 return " New merchant account has been created, shopName is "+merchant.getShopName();
   }
 }

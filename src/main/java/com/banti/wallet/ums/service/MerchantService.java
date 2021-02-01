@@ -28,7 +28,11 @@ public class MerchantService
 	 public void createOrUpdate(Merchant merchant)
 	 {
 		 merchantRepository.save(merchant);
-	 }	
+	 }
+
+	public Merchant findByMobileNo(String payeeMobileNo) {
+		return findByMobileNo(payeeMobileNo);
+	}	
 	 
    
 }

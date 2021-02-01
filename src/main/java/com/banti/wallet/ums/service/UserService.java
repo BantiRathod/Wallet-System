@@ -12,21 +12,25 @@ import com.banti.wallet.ums.repository.UserRepository;
 public class UserService {
 	
     @Autowired
-    private UserRepository repo;
-     
+    private UserRepository userRepo;
+    
+    public User findByMobileNo(String request) {
+       return userRepo.findByMobileNo(request);
+    }
+    
     public List<User> listAll() {
-        return repo.findAll();
+        return userRepo.findAll();
     }
      
     public void save(User user) {
-        repo.save(user);
+        userRepo.save(user);
     }
      
     public User get(Long id) {
-        return repo.findById(id).get();
+        return userRepo.findById(id).get();
     }
      
     public void delete(Long id) {
-        repo.deleteById(id);
+        userRepo.deleteById(id);
     }
 }

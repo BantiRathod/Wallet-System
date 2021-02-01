@@ -6,69 +6,83 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.banti.wallet.ums.model.User;
 import com.banti.wallet.ums.service.UserService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 
 
-@RestController                        //work at server side and remove view part
+@RestController                                                                    //work at server side and remove view part
 public class UserController 
 {
 	Logger logger=LoggerFactory.getLogger(UserController.class);
-	 @Autowired                        //inject object of a class annotations    
-	    private UserService service;   //injecting variable of service class(at service layer)
+	 @Autowired                                                                     //inject object of a class annotations    
+	private UserService userService;                                                //injecting variable of service class(at service layer)
 	 
-	                                  //RESTful API for get Operation
+     //RESTful API for getting all users
 	 @GetMapping("/users")
 	 public List<User> list()
 	 {
-	    return service.listAll();
+	    return userService.listAll();
 	 }
 	 
-	//RESTful API for retrieve Operation
-	 @GetMapping("/users/{id}")
+	//RESTful API for getting the record particular user
+	 @GetMapping("/user/get/{id}")
 	 public ResponseEntity<User> get(@PathVariable Long id) {
 	     try {
-	         User user = service.get(id);
+	         User user = userService.get(id);
 	         return new ResponseEntity<User> (user, HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
 	         return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 	     }      
 	 }
 	
-	 //RESTful API for Create Operation
-	 @PostMapping("/users")
-	 public void add(@RequestBody User user) {
+	 //RESTful API for Create data
+	 @PostMapping("/user")
+	 public String add(@RequestBody User user) {
 	     logger.info("request received to save the user {}",user);
-		 service.save(user);
+		 user.setRegisterDate(new Date());
+		 userService.save(user);
+		 return "Mr. "+user.getUserName()+", you have registered successfully with "+user.getMobileNo()+" mobile number";
 	 }
 	 
+	 
 	// RESTful API for Update Operation
-	 @PutMapping("/users/{id}")
-	 public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
-	     try {
-	         User existUser = service.get(id);
-	         existUser.setUserName(user.getUserName());
-	         existUser.setEmail(user.getEmail());                           //
-	         existUser.setFname(user.getFname());                          // simply updating user field's by which we have sent
-	         existUser.setLname(user.getLname());                         // 
-	         existUser.setAdd1(user.getAdd1());
-	         existUser.setAdd2(user.getAdd2());
+	 @PutMapping("/user/update/{id}")
+	 public ResponseEntity<String> update(@RequestBody User user, @PathVariable Long id) {
+	     try{
+	         User existUser = userService.get(id);
+	       //  existUser.setUserName(user.getUserName());
+	         existUser.setEmail(user.getEmail());                          
+	         existUser.setFname(user.getFname());                       
+	         existUser.setLname(user.getLname());                          
+	         existUser.setAddress(user.getAddress());
+	         existUser.setStatus(user.getStatus());
 	         existUser.setMobileNo(user.getMobileNo());
-	         service.save(existUser);
-	         return new ResponseEntity<>(HttpStatus.OK);
+	       //  existUser.setRegisterDate(user.getRegisterDate());
+	         userService.save(existUser);
+	         return new ResponseEntity<String>(" Record of the given id's user has been updated ",HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
-	         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	     }      
 	 } 
 	
 	// RESTful API for Delete Operation
-	 @DeleteMapping("/users/{id}")
-	 public void delete(@PathVariable Long id) {
-	       service.delete(id);
+	 @DeleteMapping("/user/delete/{id}")
+	 public ResponseEntity<User> delete(@PathVariable Long id)
+	 {
+		 try
+		 {
+		   User user= userService.get(id);
+		   userService.delete(id);
+		   return new ResponseEntity<User>(user,HttpStatus.OK);      
+	     }
+		  catch(NoSuchElementException e)
+		  {
+			 return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+		  }
 	 }
 }

@@ -1,4 +1,5 @@
 package com.banti.wallet.ums.model;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,28 +10,22 @@ import javax.persistence.Id;
 @Entity
 public class User{
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name="user_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long userId;
 	private String userName;
 	private String fname;
 	private String lname;
-	private String add1;
-	private String add2;
+	private String address;
+	private Date registerDate;
 	private String email;
-	private String mobileNo;
-	
-	public User()
-	{}
-	
+    private String mobileNo; 
+	private String status;
 	public Long getUserId() {
 		return userId;
 	}
-
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-
 	public String getUserName() {
 		return userName;
 	}
@@ -49,17 +44,17 @@ public class User{
 	public void setLname(String lname) {
 		this.lname = lname;
 	}
-	public String getAdd1() {
-		return add1;
+	public String getAddress() {
+		return address;
 	}
-	public void setAdd1(String add1) {
-		this.add1 = add1;
+	public void setAddress(String address) {
+		this.address = address;
 	}
-	public String getAdd2() {
-		return add2;
+	public Date getRegisterDate() {
+		return registerDate;
 	}
-	public void setAdd2(String add2) {
-		this.add2 = add2;
+	public void setRegisterDate(Date registerDate) {
+		this.registerDate = registerDate;
 	}
 	public String getEmail() {
 		return email;
@@ -67,20 +62,23 @@ public class User{
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
 	public String getMobileNo() {
 		return mobileNo;
 	}
 	public void setMobileNo(String mobileNo) {
 		this.mobileNo = mobileNo;
 	}
-
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	@Override
 	public String toString() {
-		return "User [userName=" + userName + ", fname=" + fname + ", lname=" + lname + ", add1=" + add1 + ", add2="
-				+ add2 + ", email=" + email + ", mobileNo=" + mobileNo + "]";
+		return "User [userId=" + userId + ", userName=" + userName + ", fname=" + fname + ", lname=" + lname
+				+ ", address=" + address + ", registerDate=" + registerDate + ", email=" + email + ", mobileNo="
+				+ mobileNo + ", status=" + status + "]";
 	}
-	
-	
 	
 }

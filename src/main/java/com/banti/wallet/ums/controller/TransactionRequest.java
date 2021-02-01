@@ -2,49 +2,38 @@ package com.banti.wallet.ums.controller;
 
 public class TransactionRequest {
 	private String orderId;
-	private String PayerMobileNo;
-	private String PayeeMobileNo;
+	private String payerMobileNo;
+	private String payeeMobileNo;
 	private Double amount;
-
-
-	
 	public String getOrderId() {
 		return orderId;
 	}
-
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
-
 	public String getPayerMobileNo() {
-		return PayerMobileNo;
+		return payerMobileNo;
 	}
-
 	public void setPayerMobileNo(String payerMobileNo) {
-		PayerMobileNo = payerMobileNo;
+		this.payerMobileNo = payerMobileNo;
 	}
-
 	public String getPayeeMobileNo() {
-		return PayeeMobileNo;
+		return payeeMobileNo;
 	}
-
 	public void setPayeeMobileNo(String payeeMobileNo) {
-		PayeeMobileNo = payeeMobileNo;
+		this.payeeMobileNo = payeeMobileNo;
 	}
-
 	public Double getAmount() {
 		return amount;
 	}
-
 	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "TransactionRequest [orderId=" + orderId + ", PayerMobileNo=" + PayerMobileNo + ", PayeeMobileNo="
-				+ PayeeMobileNo + ", amount=" + amount + "]";
+		return "TransactionRequest [orderId=" + orderId + ", payerMobileNo=" + payerMobileNo + ", payeeMobileNo="
+				+ payeeMobileNo + ", amount=" + amount + "]";
 	}
-	
 	
 }

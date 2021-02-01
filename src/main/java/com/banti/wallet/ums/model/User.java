@@ -12,8 +12,8 @@ public class User{
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long userId;
 	private String userName;
-	private String fname;
-	private String lname;
+	private String firstName;
+	private String lastName;
 	private String address;
 	private Date registerDate;
 	private String email;
@@ -31,18 +31,7 @@ public class User{
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public String getFname() {
-		return fname;
-	}
-	public void setFname(String fname) {
-		this.fname = fname;
-	}
-	public String getLname() {
-		return lname;
-	}
-	public void setLname(String lname) {
-		this.lname = lname;
-	}
+	
 	public String getAddress() {
 		return address;
 	}
@@ -73,10 +62,26 @@ public class User{
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 	@Override
 	public String toString() {
-		return "User [userId=" + userId + ", userName=" + userName + ", fname=" + fname + ", lname=" + lname
-				+ ", address=" + address + ", registerDate=" + registerDate + ", email=" + email + ", mobileNo="
-				+ mobileNo + ", status=" + status + "]";
+		return "User [userId=" + userId + ", userName=" + userName + ", firstName=" + firstName + ", lastName="
+				+ lastName + ", address=" + address + ", registerDate=" + registerDate + ", email=" + email
+				+ ", mobileNo=" + mobileNo + ", status=" + status + "]";
 	}	
+	
+	
 }

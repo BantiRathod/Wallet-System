@@ -25,9 +25,14 @@ public class MerchantWalletService
 	  return  merchantWalletRepository.findById(mobileNo).get();
 	 }
 	
-	 public void createOrUpdate( MerchantWallet  merchantwallet)
+	 public void create( MerchantWallet  merchantwallet)
 	 {
 		 merchantWalletRepository.save(merchantwallet);
-	 }	
+	 }
+
+	public void update(MerchantWallet payeeMerchantWallet) {
+		merchantWalletRepository.save(payeeMerchantWallet);
+		
+	}	
 
 }

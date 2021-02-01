@@ -23,7 +23,7 @@ public class TransactionService
 	public Page<WalletTransaction> listAll(int pageNum, String payerNo)
 	{
 	    int pageSize = 3; 
-	    Pageable pageable = PageRequest.of(pageNum-1, pageSize, Sort.Direction.ASC, "amount");
+	    Pageable pageable = PageRequest.of(pageNum-1, pageSize, Sort.Direction.ASC, "id");
 	    return trepo.findAllByPayerNo(payerNo,pageable);
 	}
 	
@@ -31,7 +31,7 @@ public class TransactionService
 	{
 		return trepo.findById(id).get();
 	}
-	public WalletTransaction createTransaction(WalletTransaction transaction)
+	public WalletTransaction saveTransaction(WalletTransaction transaction)
 	{
 		return trepo.save(transaction);
 	}

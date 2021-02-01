@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //import javax.print.attribute.HashAttributeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,7 @@ import com.banti.wallet.ums.validator.request.TransactionRequestValidator;
 
 @RestController
 public class TransactionController {
+	Logger logger=LoggerFactory.getLogger(TransactionController.class);
 
 	@Autowired
 	private TransactionService transactionService;
@@ -164,10 +168,12 @@ public class TransactionController {
 	}
 	
 	// API FOR SENDING MONEY TO A PERSION
-	@PostMapping("/Transaction/PtoP")
-	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest ptopTransaction) {
+	@PostMapping("/Transaction/P2P")
+	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest ptopTransaction) 
+	{
+		logger.info("p2p transaction received {}",ptopTransaction);
 		User payerUser = userService.findByMobileNo(ptopTransaction.getPayerMobileNo());
-		User payeeUser = userService.findByMobileNo(ptopTransaction.getPayerMobileNo());
+		User payeeUser = userService.findByMobileNo(ptopTransaction.getPayeeMobileNo());
 		
 		TransactionResponse transactionResponse = new TransactionResponse();
 
@@ -189,6 +195,7 @@ public class TransactionController {
 
 		Wallet payerWallet = walletService.get(ptopTransaction.getPayerMobileNo());           // wallet is active or not
 		Wallet payeeWallet = walletService.get(ptopTransaction.getPayeeMobileNo());
+		
 		if (payerWallet.getStatus() == "disable" || payeeWallet.getStatus() == "disable") {
 			transactionResponse.setMessage("Transaction couldn't be done : wallet is not active");
 			transactionResponse.setDate(new Date());

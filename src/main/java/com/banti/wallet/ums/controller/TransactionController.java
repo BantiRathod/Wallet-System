@@ -33,6 +33,8 @@ import com.banti.wallet.ums.service.MerchantWalletService;
 import com.banti.wallet.ums.service.TransactionService;
 import com.banti.wallet.ums.service.UserService;
 import com.banti.wallet.ums.service.WalletService;
+import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
+import com.banti.wallet.ums.transactionClassesToPayment.TransactionResponse;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
 import com.banti.wallet.ums.validator.request.TransactionRequestValidator;
 
@@ -130,7 +132,7 @@ public class TransactionController {
 		Merchant payeeMerchant = (Merchant) p2mContext.get(ContextConstant.MERCHANT_ACCOUNT);
 		
 		transactionResponse.setTransactionType(TxnType.P2M.name());
-		transactionResponse.setPayerName(payerUser.getFname());
+		transactionResponse.setPayerName(payerUser.getFirstName());
 		transactionResponse.setPayeeName(payeeMerchant.getShopName());
 		transactionResponse.setMessage("Transaction Successful");
 		transactionResponse.setDate(new Date());
@@ -184,7 +186,7 @@ public class TransactionController {
 			TransactionResponse transactionResponse = new TransactionResponse();
 			
 			try {
-			    //start service
+			    
 				TransactionRequestValidator.p2pRequestValidator(request);
 				
 				transactionBusinessValidator.p2pValidation(request);
@@ -192,7 +194,7 @@ public class TransactionController {
 				WalletTransaction transaction = doMoneyTransferToPerson(request);
 	            
 				WalletTransaction tempTransaction = createTransactionP2P(request, transaction);
-				// end service
+				
 				
 	 		  generateP2PResponse(request, transactionResponse, tempTransaction);
 	 			
@@ -213,8 +215,8 @@ public class TransactionController {
 			User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
 			User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
 
-			transactionResponse.setPayerName(payerUser.getFname());
-			transactionResponse.setPayeeName(payeeUser.getFname());
+			transactionResponse.setPayerName(payerUser.getFirstName());
+			transactionResponse.setPayeeName(payeeUser.getFirstName());
 			transactionResponse.setMessage("Transaction Successful");
 			transactionResponse.setDate(new Date());
 			transactionResponse.setTransactionType(TxnType.P2P.name());
@@ -369,8 +371,8 @@ public class TransactionController {
 		User user = (User) addMoneyContext.get(ContextConstant.USER_ACCOUNT);
 	
 
-		transactionResponse.setPayerName(user.getFname());
-		transactionResponse.setPayeeName(user.getFname());
+		transactionResponse.setPayerName(user.getFirstName());
+		transactionResponse.setPayeeName(user.getFirstName());
 		transactionResponse.setMessage("Transaction Successful");
 		transactionResponse.setDate(new Date());
 		transactionResponse.setTransactionType(TxnType.ADD_MONEY.name());

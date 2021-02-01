@@ -22,4 +22,8 @@ public class BankService {
 	public Bank get(String accountNo){
 		return bankRepo.findById(accountNo).get();
 	}
+
+	public void update(Bank payerBank) {
+		bankRepo.save(payerBank);
+	}
 }

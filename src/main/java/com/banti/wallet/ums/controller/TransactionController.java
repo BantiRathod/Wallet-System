@@ -53,6 +53,7 @@ public class TransactionController {
 	
 	@Autowired
 	private BankService bankService;
+	
 	//@Autowired
 	//private MerchantRepository merchantRepository;
 	@Autowired
@@ -95,26 +96,31 @@ public class TransactionController {
 	// API FOR SENDING MONEY TO A MERCHANT
 	@PostMapping("/transaction/P2M")
 	public ResponseEntity<TransactionResponse> payMoneyToMerchant(@RequestBody TransactionRequest request) {
+		logger.info("p2m transaction received {}", request);
+		
 		TransactionResponse transactionResponse = new TransactionResponse();
 		Map<String, Object> p2mContext = new HashMap<>();
 		try {
 			TransactionRequestValidator.p2mRequestValidator(request);
-			//call service
+			
 			transactionBusinessValidator.p2mValidation(request, p2mContext);
-
+            
 			WalletTransaction transaction = doMoneyTransfer(request, p2mContext);
-
+            
 			WalletTransaction tempTransaction = createTransaction(request, transaction);
-			//end service
-			generateP2MResponse(request, transactionResponse, p2mContext, tempTransaction);
+			// end service
+			
+ 			generateP2MResponse(request, transactionResponse, p2mContext, tempTransaction);
 
 		} catch (Exception e) {
 			System.out.println("Exception occured" + e);
 			transactionResponse.setOrderId(request.getOrderId());
 			transactionResponse.setMessage(e.getMessage());
 			transactionResponse.setDate(new Date());
+			logger.info("p2m transaction received {}", request);
 			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 		}
+		logger.info("p2m transaction received {}", request);
 		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 	}
 
@@ -126,7 +132,7 @@ public class TransactionController {
 		transactionResponse.setPayerName(payerUser.getFname());
 		transactionResponse.setPayeeName(payeeMerchant.getShopName());
 		transactionResponse.setMessage("Transaction Successful");
-		transactionResponse.setDate(tempTransaction.getTransactionDate());
+		transactionResponse.setDate(new Date());
 		transactionResponse.setId(tempTransaction.getId());
 		transactionResponse.setOrderId(request.getOrderId());
 	}
@@ -138,20 +144,20 @@ public class TransactionController {
 		transaction.setAmount(request.getAmount());
 		transaction.setTransactionType(TxnType.P2M.name());
 		transaction.setTransactionDate(new Date());
-		WalletTransaction tempTransaction = transactionService.createTransaction(transaction);
+		WalletTransaction tempTransaction = transactionService.saveTransaction(transaction);
 		return tempTransaction;
 	}
 
 	private WalletTransaction doMoneyTransfer(TransactionRequest request, Map<String, Object> p2mContext) {
-		Wallet payerWallet = (Wallet) p2mContext.get(ContextConstant.USER_WALLET);
+		Wallet payerUserWallet = (Wallet) p2mContext.get(ContextConstant.USER_WALLET);
 
-		Double balance = payerWallet.getBalance();
+		Double balance = payerUserWallet.getBalance();
 		Double amount = request.getAmount();
 
 		WalletTransaction transaction = new WalletTransaction();
 
 		balance -= amount;
-		payerWallet.setBalance(balance);
+		payerUserWallet.setBalance(balance);
 
 		transaction.setPayerRemainingAmount(balance);
 
@@ -162,18 +168,96 @@ public class TransactionController {
 		transaction.setPayeeRemainingAmount(balance);
 		payeeMerchantWallet.setBalance(balance);
 
-		walletService.update(payerWallet);
-		merchantWalletService.createOrUpdate(payeeMerchantWallet);
+		walletService.update(payerUserWallet);
+		merchantWalletService.update(payeeMerchantWallet);
 		return transaction;
 	}
 	
-	// API FOR SENDING MONEY TO A PERSION
+	// API FOR SENDING MONEY TO A PERSON
 	@PostMapping("/Transaction/P2P")
-	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest ptopTransaction) 
+	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest request) 
 	{
-		logger.info("p2p transaction received {}",ptopTransaction);
-		User payerUser = userService.findByMobileNo(ptopTransaction.getPayerMobileNo());
-		User payeeUser = userService.findByMobileNo(ptopTransaction.getPayeeMobileNo());
+		logger.info("p2p transaction received {}",request);
+		
+			TransactionResponse transactionResponse = new TransactionResponse();
+			
+			try {
+			    //start service
+				TransactionRequestValidator.p2pRequestValidator(request);
+				
+				transactionBusinessValidator.p2pValidation(request);
+	            
+				WalletTransaction transaction = doMoneyTransferToPerson(request);
+	            
+				WalletTransaction tempTransaction = createTransactionP2P(request, transaction);
+				// end service
+				
+	 		  generateP2PResponse(request, transactionResponse, tempTransaction);
+	 			
+			} catch (Exception e) {
+				System.out.println("Exception occured" + e);
+				transactionResponse.setOrderId(request.getOrderId());
+				transactionResponse.setMessage(e.getMessage());
+				transactionResponse.setDate(new Date());
+				logger.info("p2m transaction received {}",transactionResponse);
+				return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
+			}
+			logger.info("p2m transaction received {}",transactionResponse );
+			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
+		}
+
+		private void generateP2PResponse(TransactionRequest request, TransactionResponse transactionResponse,
+			WalletTransaction tempTransaction) {
+			User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
+			User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
+
+			transactionResponse.setPayerName(payerUser.getFname());
+			transactionResponse.setPayeeName(payeeUser.getFname());
+			transactionResponse.setMessage("Transaction Successful");
+			transactionResponse.setDate(new Date());
+			transactionResponse.setId(tempTransaction.getId());
+			transactionResponse.setOrderId(request.getOrderId());
+		}
+
+		private WalletTransaction createTransactionP2P(TransactionRequest request, WalletTransaction transaction) {
+			transaction.setStatus("transaction succesful");
+			transaction.setPayeeMobileNo(request.getPayeeMobileNo());
+			transaction.setPayerMobileNo(request.getPayerMobileNo());
+			transaction.setAmount(request.getAmount());
+			transaction.setTransactionType(TxnType.P2P.name());
+			transaction.setTransactionDate(new Date());
+			WalletTransaction tempTransaction = transactionService.saveTransaction(transaction);
+			return tempTransaction;
+		}
+
+		private WalletTransaction  doMoneyTransferToPerson(TransactionRequest request) {
+			
+			Wallet payerUserWallet=walletService.get(request.getPayerMobileNo());
+
+			Double balance = payerUserWallet.getBalance();
+			Double amount = request.getAmount();
+
+			WalletTransaction transaction = new WalletTransaction();
+
+			balance -= amount;
+			payerUserWallet.setBalance(balance);
+
+			transaction.setPayerRemainingAmount(balance);
+
+			Wallet payeeUserWallet=walletService.get(request.getPayeeMobileNo());
+
+			balance = payeeUserWallet.getBalance();
+			balance += amount;
+			transaction.setPayeeRemainingAmount(balance);
+			payeeUserWallet.setBalance(balance);
+
+			walletService.update(payerUserWallet);
+			walletService.update(payeeUserWallet);
+			return transaction;
+		}	
+		/*
+		User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
+		User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
 		
 		TransactionResponse transactionResponse = new TransactionResponse();
 
@@ -240,75 +324,89 @@ public class TransactionController {
 		transactionResponse.setId(currentTransaction.getId());
 		transactionResponse.setOrderId(ptopTransaction.getOrderId());
 		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
-	}
-
-	// API FOR ADDINGMONEY
+*/	
+		
+		
+	 // API FOR ADDINGMONEY IN WALLET FROM BANK
 	@PostMapping("Transaction/addMoney")
-	public ResponseEntity<TransactionResponse> addMoney(@RequestBody TransactionRequest addMoneyTransaction) {
-
-		User payerUser = userService.findByMobileNo(addMoneyTransaction.getPayerMobileNo());
-
+	public ResponseEntity<TransactionResponse> addMoney(@RequestBody TransactionRequest request) {
+		logger.info("addMoney transaction received {}",request);
+		
 		TransactionResponse transactionResponse = new TransactionResponse();
-		if (payerUser == null) {
-			transactionResponse.setMessage("Transaction couldn't be done : user is not exist");
+		Map<String, Object> addMoneyContext = new HashMap<>();
+		
+		try {
+		    //start service
+			TransactionRequestValidator.addMoneyRequestValidator(request);
+			
+			transactionBusinessValidator.addMoneyValidation(request,addMoneyContext);
+            
+			WalletTransaction transaction = doMoneyTransferFromBank(request,addMoneyContext);
+            
+			WalletTransaction tempTransaction = createTransactionForAddMoney(request, transaction);
+			// end service
+			
+ 		  generateAddMoneyResponse(request, transactionResponse, addMoneyContext,tempTransaction);
+ 			
+		} catch (Exception e) {
+			System.out.println("Exception occured" + e);
+			transactionResponse.setOrderId(request.getOrderId());
+			transactionResponse.setMessage(e.getMessage());
 			transactionResponse.setDate(new Date());
-			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
+			logger.info("addMoney transaction responded {}",transactionResponse);
+			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 		}
-
-		transactionResponse.setPayerName(payerUser.getFname());
-		transactionResponse.setPayeeName(payerUser.getFname());
-		if (payerUser.getStatus() == "unactive") // user is not active
-		{
-			transactionResponse.setMessage("Transaction couldn't be done : user is not active");
-			transactionResponse.setDate(new Date());
-			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
-		}
-
-		Wallet payeeWallet = walletService.get(addMoneyTransaction.getPayeeMobileNo());
-		Bank payerBank = bankService.get(addMoneyTransaction.getPayeeMobileNo());
-		if (payeeWallet.getStatus() == "disable") {
-			transactionResponse.setMessage("Transaction couldn't be done : wallet is not active");
-			transactionResponse.setDate(new Date());
-			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
-		}
-
-		Double balance = payeeWallet.getBalance();
-		Double amount = addMoneyTransaction.getAmount();
-
-		WalletTransaction transaction = new WalletTransaction();
-
-		if ((amount > 0) && (balance >= amount)) {
-			balance -= amount;
-			payerBank.setBalance(balance);
-			transaction.setPayerRemainingAmount(balance);
-
-			balance = payeeWallet.getBalance();
-			balance += amount;
-			transaction.setPayeeRemainingAmount(balance);
-			payeeWallet.setBalance(balance);
-
-			bankService.saveBankDetail(payerBank);
-			walletService.update(payeeWallet);
-			transaction.setStatus("transaction succesful");
-		} else {
-			transaction.setStatus(" transaction failed : balance is not sufficient to pay");
-			transaction.setPayeeRemainingAmount(payeeWallet.getBalance());
-			transaction.setPayerRemainingAmount(payerBank.getBalance());
-		}
-
-		transaction.setPayeeMobileNo(addMoneyTransaction.getPayeeMobileNo());
-		transaction.setPayerMobileNo(addMoneyTransaction.getPayerMobileNo());
-		transaction.setAmount(addMoneyTransaction.getAmount());
-		transaction.setTransactionType(TxnType.P2P.name());
-		transaction.setTransactionDate(new Date());
-		transaction.setOrderId(addMoneyTransaction.getOrderId());
-		WalletTransaction tempTransaction = transactionService.createTransaction(transaction);
-
-		transactionResponse.setMessage(" Transaction successful, Repeese have been added ");
-		transactionResponse.setDate(tempTransaction.getTransactionDate());
-		transactionResponse.setOrderId(addMoneyTransaction.getOrderId());
-		transactionResponse.setId(tempTransaction.getId());
+		logger.info("addMoney transaction received {}",transactionResponse);
 		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 	}
 
+	private void generateAddMoneyResponse(TransactionRequest request, TransactionResponse transactionResponse,
+		Map<String, Object> addMoneyContext,WalletTransaction tempTransaction) {
+		User user = (User) addMoneyContext.get(ContextConstant.USER_ACCOUNT);
+	
+
+		transactionResponse.setPayerName(user.getFname());
+		transactionResponse.setPayeeName(user.getFname());
+		transactionResponse.setMessage("Transaction Successful");
+		transactionResponse.setDate(new Date());
+		transactionResponse.setId(tempTransaction.getId());
+		transactionResponse.setOrderId(request.getOrderId());
+	}
+
+	private WalletTransaction createTransactionForAddMoney(TransactionRequest request, WalletTransaction transaction) {
+		transaction.setStatus(" Money added succesfully");
+		transaction.setPayeeMobileNo(request.getPayeeMobileNo());
+		transaction.setPayerMobileNo(request.getPayerMobileNo());
+		transaction.setAmount(request.getAmount());
+		transaction.setTransactionType(TxnType.ADD_MONEY.name());
+		transaction.setTransactionDate(new Date());
+		WalletTransaction tempTransaction = transactionService.saveTransaction(transaction);
+		return tempTransaction;
+	}
+
+	private WalletTransaction doMoneyTransferFromBank(TransactionRequest request, Map<String, Object> addMoneyContext) {
+		
+		
+        Bank payerBank = (Bank)addMoneyContext.get(ContextConstant.BANK);
+        
+		Double balance = payerBank.getBalance();
+		Double amount = request.getAmount();
+
+		WalletTransaction transaction = new WalletTransaction();
+
+		balance -= amount;
+		payerBank.setBalance(balance);
+
+		Wallet payeeUserWallet=(Wallet) addMoneyContext.get(ContextConstant.USER_WALLET);
+
+		balance = payeeUserWallet.getBalance();
+		balance += amount;
+		transaction.setPayeeRemainingAmount(balance);
+		payeeUserWallet.setBalance(balance);
+
+		bankService.update(payerBank);
+		walletService.update(payeeUserWallet);
+		return transaction;
+	}	
+		
 }

@@ -51,7 +51,7 @@ public class MerchantWalletController
 	@PostMapping("/merchantWallet")
 	public String createWallet(@RequestBody MerchantWallet merchantWallet)
       {
-		merchantWalletService.createOrUpdate(merchantWallet);
+		merchantWalletService.create(merchantWallet);
 		return "new merchant wallet of "+merchantWallet.getMobileNo()+" on "+merchantWallet.getMerchantWalletcreatedDate()+"has heen created";
       }
 	

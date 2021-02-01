@@ -1,5 +1,7 @@
 package com.banti.wallet.ums.controller;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +18,9 @@ public class BankController
     @PostMapping("/bank")
     public String createBankAccount(@RequestBody Bank bank)
     {    
+    	 bank.setDate(new Date());
     	 bankService.saveBankDetail(bank);
-    	 return "account has been opened of this account no. "+ bank.getAccountNo();
+    	 
+    	 return "Account has been linked, accountss no. is "+ bank.getAccountNo();
     }
 }

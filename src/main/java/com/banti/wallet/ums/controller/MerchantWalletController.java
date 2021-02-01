@@ -1,7 +1,11 @@
 package com.banti.wallet.ums.controller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import com.banti.wallet.ums.service.MerchantWalletService;
 @RestController
 public class MerchantWalletController 
 {
+	Logger logger=LoggerFactory.getLogger(MerchantController.class);
  
 	@Autowired
 	private MerchantWalletService merchantWalletService;
@@ -51,8 +56,10 @@ public class MerchantWalletController
 	@PostMapping("/merchantWallet")
 	public String createWallet(@RequestBody MerchantWallet merchantWallet)
       {
+		logger.info("merchantWallet received {} ", merchantWallet);
+		merchantWallet.setMerchantWalletcreatedDate(new Date());
 		merchantWalletService.create(merchantWallet);
-		return "new merchant wallet of "+merchantWallet.getMobileNo()+" on "+merchantWallet.getMerchantWalletcreatedDate()+"has heen created";
+		return "New merchant wallet of "+merchantWallet.getMobileNo()+"has heen created on "+ merchantWallet.getMerchantWalletcreatedDate();
       }
 	
 }

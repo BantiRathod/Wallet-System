@@ -35,8 +35,8 @@ public class TransactionBusinessValidator {
 	
 	
 	public void p2mValidation(TransactionRequest request, Map<String, Object> p2mContext) throws Exception {
-		// check user exist
 		
+		// CHECK USER EXIST OR NOT
 		User user = userService.findByMobileNo(request.getPayerMobileNo());
 		
 		if(user==null) {
@@ -57,7 +57,7 @@ public class TransactionBusinessValidator {
 		
 		p2mContext.put(ContextConstant.MERCHANT_ACCOUNT, merchant);
 		
-		//check user and merchant wallet is active or not
+		//CHECK WALLET OF MERCAHNT AND USER 
 		MerchantWallet payeeMerchantWallet = merchantWalletService.get(request.getPayeeMobileNo());
 		Wallet payerUserWallet = userWalletService.get(request.getPayerMobileNo());
 		
@@ -67,7 +67,7 @@ public class TransactionBusinessValidator {
 			 throw new Exception("user wallet is not active");
 		p2mContext.put(ContextConstant.MERCHANT_WALLET, payeeMerchantWallet);
 		
-		//check user has sufficient amount
+		//CHECK USER HAS SUFFICIENT AMOUNT
 		 payerUserWallet = userWalletService.get(request.getPayerMobileNo());
 		if(payerUserWallet.getBalance()<request.getAmount()) {
 			throw new Exception(String.format("user does not have sufficient balance, current balance: %d, request txnAmt: %d",payerUserWallet.getBalance(),request.getAmount()));
@@ -77,8 +77,7 @@ public class TransactionBusinessValidator {
 
 	
 	public void p2pValidation(TransactionRequest request) throws Exception {
-		// check  payer user exist or not
-		
+		//CHECK PAYER USER EXIST 
 		User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
 		
 		if(payerUser==null) 
@@ -89,7 +88,6 @@ public class TransactionBusinessValidator {
 		//p2pContext.put(ContextConstant.USER_ACCOUNT,payerUser );
 		
 		// CHECK payeeUser EXIST OR NOT
-		
 		User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
 		
 		if(payeeUser==null)  
@@ -117,7 +115,7 @@ public class TransactionBusinessValidator {
 }		
 	
 
-  // check request parameter for addMoney API
+  // CHECK REQUEST PARAMETER FOR ADDMONEY API
   public void addMoneyValidation(TransactionRequest request, Map<String, Object> addMoneyContext) throws Exception
   {
 	// check  payer user exist or not

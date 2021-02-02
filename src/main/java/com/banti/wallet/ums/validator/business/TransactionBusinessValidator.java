@@ -5,7 +5,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.banti.wallet.ums.constant.ContextConstant;
-import com.banti.wallet.ums.controller.TransactionRequest;
 import com.banti.wallet.ums.enums.AccountStatus;
 import com.banti.wallet.ums.enums.PersonStatus;
 import com.banti.wallet.ums.model.Bank;
@@ -18,6 +17,7 @@ import com.banti.wallet.ums.service.MerchantService;
 import com.banti.wallet.ums.service.MerchantWalletService;
 import com.banti.wallet.ums.service.UserService;
 import com.banti.wallet.ums.service.WalletService;
+import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
 
 
 @Service

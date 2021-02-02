@@ -74,7 +74,7 @@ public class TransactionController {
 
 	@GetMapping("transaction/summary/{id}")
 	public ResponseEntity<Page<WalletTransaction>> getTrans(@PathVariable Long id) {
-		try // UPDATE static to dynamic page no;
+		try
 		{
 			String payerNo = userService.get(id).getMobileNo();
 			Page<WalletTransaction> page = transactionService.listAll(1, payerNo);
@@ -110,7 +110,6 @@ public class TransactionController {
 			WalletTransaction transaction = doMoneyTransfer(request, p2mContext);
             
 			WalletTransaction tempTransaction = createTransaction(request, transaction);
-			// end service
 			
  			generateP2MResponse(request, transactionResponse, p2mContext, tempTransaction);
 
@@ -261,76 +260,7 @@ public class TransactionController {
 			walletService.update(payeeUserWallet);
 			return transaction;
 		}	
-		/*
-		User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
-		User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
 		
-		TransactionResponse transactionResponse = new TransactionResponse();
-
-		if (payerUser == null || payeeUser == null) {
-			transactionResponse.setMessage("Transaction couldn't be done : user is not exist");
-			transactionResponse.setDate(new Date());
-			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
-		}
-
-		transactionResponse.setPayeeName(payeeUser.getFname());
-		transactionResponse.setPayerName(payerUser.getFname());
-
-		if (payerUser.getStatus() == "unactive" || payeeUser.getStatus() == "unactive") // user is not active
-		{
-			transactionResponse.setMessage("Transaction couldn't be done : user is not active");
-			transactionResponse.setDate(new Date());
-			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
-		}
-
-		Wallet payerWallet = walletService.get(ptopTransaction.getPayerMobileNo());           // wallet is active or not
-		Wallet payeeWallet = walletService.get(ptopTransaction.getPayeeMobileNo());
-		
-		if (payerWallet.getStatus() == "disable" || payeeWallet.getStatus() == "disable") {
-			transactionResponse.setMessage("Transaction couldn't be done : wallet is not active");
-			transactionResponse.setDate(new Date());
-			return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
-		}
-
-		Double balance = payerWallet.getBalance();
-		Double amount = ptopTransaction.getAmount();
-
-		WalletTransaction transaction = new WalletTransaction();
-
-		if ((amount >= 0) && (balance >= amount)) {
-			balance -= amount;
-
-			payerWallet.setBalance(balance);
-
-			transaction.setPayerRemainingAmount(balance);
-			balance = payeeWallet.getBalance();
-			balance += amount;
-			transaction.setPayeeRemainingAmount(balance);
-			payeeWallet.setBalance(balance);
-
-			walletService.update(payerWallet);
-			walletService.update(payeeWallet);
-			
-			transaction.setStatus("transaction succesful");
-		} else {
-			transaction.setStatus(" transaction failed : balance is not sufficient to pay");
-			transaction.setPayeeRemainingAmount(payeeWallet.getBalance());
-			transaction.setPayerRemainingAmount(payerWallet.getBalance());
-		}
-		transaction.setPayeeMobileNo(ptopTransaction.getPayeeMobileNo());
-		transaction.setPayerMobileNo(ptopTransaction.getPayerMobileNo());
-		transaction.setAmount(ptopTransaction.getAmount());
-		transaction.setTransactionType(TxnType.P2P.name());
-		transaction.setTransactionDate(new Date());
-
-		WalletTransaction currentTransaction = transactionService.createTransaction(transaction);
-        
-		transactionResponse.setMessage("Transaction Successful");
-		transactionResponse.setDate(currentTransaction.getTransactionDate());
-		transactionResponse.setId(currentTransaction.getId());
-		transactionResponse.setOrderId(ptopTransaction.getOrderId());
-		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
-*/	
 		
 		
 	 // API FOR ADDINGMONEY IN WALLET FROM BANK
@@ -418,3 +348,74 @@ public class TransactionController {
 	}	
 		
 }
+
+/*
+User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
+User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
+
+TransactionResponse transactionResponse = new TransactionResponse();
+
+if (payerUser == null || payeeUser == null) {
+	transactionResponse.setMessage("Transaction couldn't be done : user is not exist");
+	transactionResponse.setDate(new Date());
+	return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
+}
+
+transactionResponse.setPayeeName(payeeUser.getFname());
+transactionResponse.setPayerName(payerUser.getFname());
+
+if (payerUser.getStatus() == "unactive" || payeeUser.getStatus() == "unactive") // user is not active
+{
+	transactionResponse.setMessage("Transaction couldn't be done : user is not active");
+	transactionResponse.setDate(new Date());
+	return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
+}
+
+Wallet payerWallet = walletService.get(ptopTransaction.getPayerMobileNo());           // wallet is active or not
+Wallet payeeWallet = walletService.get(ptopTransaction.getPayeeMobileNo());
+
+if (payerWallet.getStatus() == "disable" || payeeWallet.getStatus() == "disable") {
+	transactionResponse.setMessage("Transaction couldn't be done : wallet is not active");
+	transactionResponse.setDate(new Date());
+	return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.NOT_FOUND);
+}
+
+Double balance = payerWallet.getBalance();
+Double amount = ptopTransaction.getAmount();
+
+WalletTransaction transaction = new WalletTransaction();
+
+if ((amount >= 0) && (balance >= amount)) {
+	balance -= amount;
+
+	payerWallet.setBalance(balance);
+
+	transaction.setPayerRemainingAmount(balance);
+	balance = payeeWallet.getBalance();
+	balance += amount;
+	transaction.setPayeeRemainingAmount(balance);
+	payeeWallet.setBalance(balance);
+
+	walletService.update(payerWallet);
+	walletService.update(payeeWallet);
+	
+	transaction.setStatus("transaction succesful");
+} else {
+	transaction.setStatus(" transaction failed : balance is not sufficient to pay");
+	transaction.setPayeeRemainingAmount(payeeWallet.getBalance());
+	transaction.setPayerRemainingAmount(payerWallet.getBalance());
+}
+transaction.setPayeeMobileNo(ptopTransaction.getPayeeMobileNo());
+transaction.setPayerMobileNo(ptopTransaction.getPayerMobileNo());
+transaction.setAmount(ptopTransaction.getAmount());
+transaction.setTransactionType(TxnType.P2P.name());
+transaction.setTransactionDate(new Date());
+
+WalletTransaction currentTransaction = transactionService.createTransaction(transaction);
+
+transactionResponse.setMessage("Transaction Successful");
+transactionResponse.setDate(currentTransaction.getTransactionDate());
+transactionResponse.setId(currentTransaction.getId());
+transactionResponse.setOrderId(ptopTransaction.getOrderId());
+return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
+*/	

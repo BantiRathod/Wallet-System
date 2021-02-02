@@ -28,6 +28,7 @@ import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.User;
 import com.banti.wallet.ums.model.Wallet;
 import com.banti.wallet.ums.model.WalletTransaction;
+import com.banti.wallet.ums.pagination.PaginationRequest;
 import com.banti.wallet.ums.service.BankService;
 import com.banti.wallet.ums.service.MerchantWalletService;
 import com.banti.wallet.ums.service.TransactionService;
@@ -72,12 +73,15 @@ public class TransactionController {
 	 * TODO add paging in request parameter
 	 */
 
-	@GetMapping("transaction/summary/{id}")
-	public ResponseEntity<Page<WalletTransaction>> getTrans(@PathVariable Long id) {
+	@GetMapping("transaction/summary")
+	public ResponseEntity<Page<WalletTransaction>> getTrans(@RequestBody PaginationRequest paginationRequest) {
+	logger.info("paginationRequest received {}", paginationRequest);
 		try
 		{
-			String payerNo = userService.get(id).getMobileNo();
-			Page<WalletTransaction> page = transactionService.listAll(1, payerNo);
+			String payerMobileNo = userService.get(paginationRequest.getUserId()).getMobileNo();
+			Page<WalletTransaction> page = transactionService.listAll(paginationRequest , payerMobileNo);
+			
+			logger.info("paginationResponse respond {}", page);
 			return new ResponseEntity<Page<WalletTransaction>>(page, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<Page<WalletTransaction>>(HttpStatus.NOT_FOUND);

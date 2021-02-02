@@ -1,4 +1,4 @@
-package com.banti.wallet.ums.controller;
+package com.banti.wallet.ums.transactionClassesToPayment;
 
 public class TransactionRequest {
 	private String orderId;

@@ -12,6 +12,6 @@ import com.banti.wallet.ums.model.WalletTransaction;
 public interface TransactionRepository extends JpaRepository<WalletTransaction,Long> {
 	
 	
-	  @Query("Select t from WalletTransaction t where t.payerMobileNo = :payerNo")                                  //jpa query for retrieving tran. sum for given mobileno                                                                                                                                                                                             // 
+	  @Query("Select t from WalletTransaction t where t.payerMobileNo = :payerNo ")                                  //jpa query for retrieving tran. sum for given mobileno                                                                                                                                                                                             // 
 	  Page<WalletTransaction> findAllByPayerNo(@Param("payerNo") String payerNo, Pageable pageable);	 
 }

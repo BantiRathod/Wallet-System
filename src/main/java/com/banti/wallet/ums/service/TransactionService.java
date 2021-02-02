@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.banti.wallet.ums.model.WalletTransaction;
+import com.banti.wallet.ums.pagination.PaginationRequest;
 import com.banti.wallet.ums.repository.TransactionRepository;
 
 @Service
@@ -20,11 +21,10 @@ public class TransactionService
 {
 	@Autowired
 	private TransactionRepository trepo;
-	public Page<WalletTransaction> listAll(int pageNum, String payerNo)
+	public Page<WalletTransaction> listAll(PaginationRequest paginationRequest , String payerMobileNo)
 	{
-	    int pageSize = 3; 
-	    Pageable pageable = PageRequest.of(pageNum-1, pageSize, Sort.Direction.ASC, "id");
-	    return trepo.findAllByPayerNo(payerNo,pageable);
+	    Pageable pageable = PageRequest.of(paginationRequest.getPageNo(), paginationRequest.getPageSize(), Sort.Direction.ASC, "id");
+	    return trepo.findAllByPayerNo(payerMobileNo,pageable);
 	}
 	
 	public WalletTransaction getTransaction(Long id)

@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class MerchantWallet 
+public class MerchantWallet extends BaseWallet
 {
 	@Id
     private String mobileNo;

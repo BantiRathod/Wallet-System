@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.banti.wallet.ums.model.Wallet;
-import com.banti.wallet.ums.service.WalletService;
+import com.banti.wallet.ums.service.UserWalletService;
 
 @RestController
 public class WalletController {
 	
 	@Autowired
-	private WalletService walletService;
+	private UserWalletService walletService;
 	
 	@GetMapping("/wallets")
 	public ResponseEntity<List<Wallet>> listAll()

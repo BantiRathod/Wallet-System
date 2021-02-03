@@ -16,7 +16,7 @@ import com.banti.wallet.ums.service.BankService;
 import com.banti.wallet.ums.service.MerchantService;
 import com.banti.wallet.ums.service.MerchantWalletService;
 import com.banti.wallet.ums.service.UserService;
-import com.banti.wallet.ums.service.WalletService;
+import com.banti.wallet.ums.service.UserWalletService;
 import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
 
 
@@ -28,7 +28,7 @@ public class TransactionBusinessValidator {
 	@Autowired
 	private MerchantWalletService merchantWalletService;
 	@Autowired
-	private WalletService userWalletService;
+	private UserWalletService userWalletService;
 	@Autowired
 	private BankService bankService;
 
@@ -70,7 +70,7 @@ public class TransactionBusinessValidator {
 		//CHECK USER HAS SUFFICIENT AMOUNT
 		 payerUserWallet = userWalletService.get(request.getPayerMobileNo());
 		if(payerUserWallet.getBalance()<request.getAmount()) {
-			throw new Exception(String.format("user does not have sufficient balance, current balance: %d, request txnAmt: %d",payerUserWallet.getBalance(),request.getAmount()));
+			throw new Exception(String.format("user does not have sufficient balance, current balance: %f, request txnAmt: %f",payerUserWallet.getBalance(),request.getAmount()));
 		}		
 		p2mContext.put(ContextConstant.USER_WALLET, payerUserWallet);
 	}

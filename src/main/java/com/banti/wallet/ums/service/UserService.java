@@ -31,7 +31,7 @@ public class UserService {
     public void updateUser(User user) throws NoSuchElementException
     {
     	 User existUser =  userRepo.findById(user.getUserId()).get();
-    	 
+    
          existUser.setUserName(user.getUserName());                         
          existUser.setFirstName(user.getFirstName());                       
          existUser.setLastName(user.getLastName());                          
@@ -39,8 +39,14 @@ public class UserService {
          existUser.setMobileNo(user.getMobileNo());
          userRepo.save(existUser);
     }
-    public User saveUser(UserRequestEntity user) {
-    	User realUser=new User();
+    
+    public User saveUser(UserRequestEntity user) throws Exception{
+    	
+        User existUser = userRepo.findByMobileNo(user.getMobileNo());
+        if(existUser!=null)
+        	throw new Exception("user is already exist"); 
+        
+    	User realUser = new User();	
     	realUser.setUserName(user.getUserName());
     	realUser.setAddress(user.getAddress());
     	realUser.setFirstName(user.getFirstName());

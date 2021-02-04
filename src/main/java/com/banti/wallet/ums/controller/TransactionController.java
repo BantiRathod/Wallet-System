@@ -8,8 +8,6 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import javax.print.attribute.HashAttributeSet;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,7 +22,6 @@ import com.banti.wallet.ums.constant.ContextConstant;
 import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.Bank;
 import com.banti.wallet.ums.model.Merchant;
-import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.User;
 import com.banti.wallet.ums.model.Wallet;
 import com.banti.wallet.ums.model.WalletTransaction;
@@ -50,8 +47,8 @@ public class TransactionController {
 	@Autowired
 	private TransactionBusinessValidator transactionBusinessValidator;
 	
-	@Autowired
-	private PaginationRequestValidator paginationRequestValidator;
+	//@Autowired
+	//private PaginationRequestValidator paginationRequestValidator;
 	@Autowired
 	private UserWalletService walletService;
 	@Autowired
@@ -214,7 +211,6 @@ public class TransactionController {
 		Map<String, Object> addMoneyContext = new HashMap<>();
 
 		try {
-			// start service
 			TransactionRequestValidator.addMoneyRequestValidator(request);
 
 			transactionBusinessValidator.addMoneyValidation(request, addMoneyContext);
@@ -222,7 +218,6 @@ public class TransactionController {
 			WalletTransaction transaction = doMoneyTransferFromBank(request, addMoneyContext);
 
 			WalletTransaction tempTransaction = createTransactionForAddMoney(request, transaction);
-			// end service
 
 			generateAddMoneyResponse(request, transactionResponse, addMoneyContext, tempTransaction);
 

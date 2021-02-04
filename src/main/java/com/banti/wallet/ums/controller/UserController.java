@@ -7,9 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.banti.wallet.ums.model.User;
+import com.banti.wallet.ums.requestEntities.UserRequestEntity;
 import com.banti.wallet.ums.service.UserService;
-
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,7 +29,7 @@ public class UserController
 	 }
 	 
 	//RESTful API for getting the record particular user
-	 @GetMapping("/user/get/{id}")
+	 @GetMapping("/user/{id}")
 	 public ResponseEntity<User> get(@PathVariable Long id) {
 	     try {
 	         User user = userService.get(id);
@@ -42,31 +41,22 @@ public class UserController
 	
 	 //RESTful API for Create data
 	 @PostMapping("/user")
-	 public String add(@RequestBody User user) {
-	     logger.info("request received to save the user {}",user);
-		 user.setRegisterDate(new Date());
-		 userService.save(user);
-		 return "Mr. "+user.getUserName()+", you have registered successfully with "+user.getMobileNo()+" mobile number";
+	 public User add(@RequestBody UserRequestEntity user) {
+	     logger.info("request received to save User {}",user);
+	     return userService.saveUser(user);
+		 
 	 }
 	 
 	 
 	// RESTful API for Update Operation
-	 @PutMapping("/user/update/{id}")
+	 @PutMapping("/user/{id}")
 	 public ResponseEntity<String> update(@RequestBody User user, @PathVariable Long id) {
-	     try{
-	         User existUser = userService.get(id);
-	         existUser.setUserName(user.getUserName());
-	         existUser.setEmail(user.getEmail());                          
-	         existUser.setFirstName(user.getFirstName());                       
-	         existUser.setLastName(user.getLastName());                          
-	         existUser.setAddress(user.getAddress());
-	         existUser.setStatus(user.getStatus());
-	         existUser.setMobileNo(user.getMobileNo());
-	         //existUser.setRegisterDate(user.getRegisterDate());
-	         userService.save(existUser);
+	     try
+	     {
+	         userService.updateUser(user);
 	         return new ResponseEntity<String>(" Record of the given id's user has been updated ",HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
-	         return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+	         return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 	     }      
 	 } 
 	

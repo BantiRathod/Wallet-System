@@ -41,10 +41,9 @@ public class UserController
 	
 	 //RESTful API for Create data
 	 @PostMapping("/user")
-	 public User add(@RequestBody UserRequestEntity user) {
+	 public User add(@RequestBody UserRequestEntity user) throws Exception {
 	     logger.info("request received to save User {}",user);
-	     return userService.saveUser(user);
-		 
+	     return userService.saveUser(user);	   		 
 	 }
 	 
 	 
@@ -61,7 +60,7 @@ public class UserController
 	 } 
 	
 	// RESTful API for Delete Operation
-	 @DeleteMapping("/user/delete/{id}")
+	 @DeleteMapping("/user/{id}")
 	 public ResponseEntity<User> delete(@PathVariable Long id)
 	 {
 		 try

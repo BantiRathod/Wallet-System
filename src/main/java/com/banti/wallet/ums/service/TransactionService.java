@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import com.banti.wallet.ums.constant.ContextConstant;
 import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.MerchantWallet;
-import com.banti.wallet.ums.model.User;
-import com.banti.wallet.ums.model.Wallet;
+import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.pagination.PaginationRequest;
 import com.banti.wallet.ums.repository.TransactionRepository;
@@ -33,7 +33,7 @@ public class TransactionService
 {
 	Logger logger=LoggerFactory.getLogger(TransactionService.class);
 	@Autowired
-	private UserService userService;
+	private PersonService userService;
 	
 	@Autowired
 	private TransactionRepository trepo;
@@ -51,7 +51,7 @@ public class TransactionService
 	
 	public Page<WalletTransaction> listAll(PaginationRequest paginationRequest) throws Exception
 	{
-		User user=userService.get(paginationRequest.getUserId());
+		Person user=userService.get(paginationRequest.getUserId());
 		if(user==null) {
 			throw new Exception("user does not exist");
 		}
@@ -93,10 +93,10 @@ public class TransactionService
 	}
 
 	private WalletTransaction doMoneyTransfer(TransactionRequest request, Map<String, Object> p2mContext) {
-		Wallet payerUserWallet = (Wallet) p2mContext.get(ContextConstant.USER_WALLET);
+		PersonWallet payerUserWallet = (PersonWallet) p2mContext.get(ContextConstant.USER_WALLET);
 		
 		WalletTransaction transaction = new WalletTransaction();
-		Wallet updatedPayerUserWallet = (Wallet) userMoneyMovementService.debitMoney(payerUserWallet, request.getAmount());
+		PersonWallet updatedPayerUserWallet = (PersonWallet) userMoneyMovementService.debitMoney(payerUserWallet, request.getAmount());
 		transaction.setPayerRemainingAmount(updatedPayerUserWallet.getBalance());
 
 		MerchantWallet payeeMerchantWallet = (MerchantWallet) p2mContext.get(ContextConstant.MERCHANT_WALLET);

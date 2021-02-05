@@ -22,15 +22,15 @@ import com.banti.wallet.ums.constant.ContextConstant;
 import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.Bank;
 import com.banti.wallet.ums.model.Merchant;
-import com.banti.wallet.ums.model.User;
-import com.banti.wallet.ums.model.Wallet;
+import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.pagination.PaginationRequest;
 import com.banti.wallet.ums.service.BankService;
 
 import com.banti.wallet.ums.service.TransactionService;
-import com.banti.wallet.ums.service.UserService;
-import com.banti.wallet.ums.service.UserWalletService;
+import com.banti.wallet.ums.service.PersonService;
+import com.banti.wallet.ums.service.PersonWalletService;
 import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
 import com.banti.wallet.ums.transactionClassesToPayment.TransactionResponse;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
@@ -50,9 +50,9 @@ public class TransactionController {
 	//@Autowired
 	//private PaginationRequestValidator paginationRequestValidator;
 	@Autowired
-	private UserWalletService walletService;
+	private PersonWalletService walletService;
 	@Autowired
-	private UserService userService;
+	private PersonService userService;
 
 	@Autowired
 	private BankService bankService;
@@ -107,7 +107,7 @@ public class TransactionController {
 
 	private void generateP2MResponse(TransactionRequest request, TransactionResponse transactionResponse,
 			Map<String, Object> p2mContext, WalletTransaction tempTransaction) {
-		User payerUser = (User) p2mContext.get(ContextConstant.USER_ACCOUNT);
+		Person payerUser = (Person) p2mContext.get(ContextConstant.USER_ACCOUNT);
 		Merchant payeeMerchant = (Merchant) p2mContext.get(ContextConstant.MERCHANT_ACCOUNT);
 
 		transactionResponse.setTransactionType(TxnType.P2M.name());
@@ -152,8 +152,8 @@ public class TransactionController {
 
 	private void generateP2PResponse(TransactionRequest request, TransactionResponse transactionResponse,
 			WalletTransaction tempTransaction) {
-		User payerUser = userService.findByMobileNo(request.getPayerMobileNo());
-		User payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
+		Person payerUser = userService.findByMobileNo(request.getPayerMobileNo());
+		Person payeeUser = userService.findByMobileNo(request.getPayeeMobileNo());
 
 		transactionResponse.setPayerName(payerUser.getFirstName());
 		transactionResponse.setPayeeName(payeeUser.getFirstName());
@@ -178,7 +178,7 @@ public class TransactionController {
 
 	private WalletTransaction doMoneyTransferToPerson(TransactionRequest request) {
 
-		Wallet payerUserWallet = walletService.get(request.getPayerMobileNo());
+		PersonWallet payerUserWallet = walletService.get(request.getPayerMobileNo());
 
 		Double balance = payerUserWallet.getBalance();
 		Double amount = request.getAmount();
@@ -190,7 +190,7 @@ public class TransactionController {
 
 		transaction.setPayerRemainingAmount(balance);
 
-		Wallet payeeUserWallet = walletService.get(request.getPayeeMobileNo());
+		PersonWallet payeeUserWallet = walletService.get(request.getPayeeMobileNo());
 
 		balance = payeeUserWallet.getBalance();
 		balance += amount;
@@ -235,7 +235,7 @@ public class TransactionController {
 
 	private void generateAddMoneyResponse(TransactionRequest request, TransactionResponse transactionResponse,
 			Map<String, Object> addMoneyContext, WalletTransaction tempTransaction) {
-		User user = (User) addMoneyContext.get(ContextConstant.USER_ACCOUNT);
+		Person user = (Person) addMoneyContext.get(ContextConstant.USER_ACCOUNT);
 
 		transactionResponse.setPayerName(user.getFirstName());
 		transactionResponse.setPayeeName(user.getFirstName());
@@ -270,7 +270,7 @@ public class TransactionController {
 		balance -= amount;
 		payerBank.setBalance(balance);
 
-		Wallet payeeUserWallet = (Wallet) addMoneyContext.get(ContextConstant.USER_WALLET);
+		PersonWallet payeeUserWallet = (PersonWallet) addMoneyContext.get(ContextConstant.USER_WALLET);
 
 		balance = payeeUserWallet.getBalance();
 		balance += amount;

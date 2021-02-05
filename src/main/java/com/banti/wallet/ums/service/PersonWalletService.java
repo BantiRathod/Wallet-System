@@ -11,40 +11,40 @@ import org.springframework.stereotype.Service;
 
 import com.banti.wallet.ums.model.BaseWallet;
 
-import com.banti.wallet.ums.model.Wallet;
-import com.banti.wallet.ums.repository.WalletRepository;
+import com.banti.wallet.ums.model.PersonWallet;
+import com.banti.wallet.ums.repository.PersonWalletRepository;
 
 @Service(value="userWalletService")
 @Transactional
-public class UserWalletService implements MoneyMovementService { 
-	Logger logger=LoggerFactory.getLogger(UserWalletService.class);
+public class PersonWalletService implements MoneyMovementService { 
+	Logger logger=LoggerFactory.getLogger(PersonWalletService.class);
 	@Autowired
-	private WalletRepository wrepo;
+	private PersonWalletRepository wrepo;
 	
-	 public List<Wallet> getAll()
+	 public List<PersonWallet> getAll()
 	 {
 		 return wrepo.findAll();
 	 }
 	 
-	 public Wallet get(String mobileNo)
+	 public PersonWallet get(String mobileNo)
 	 {
 	  return  wrepo.findById(mobileNo).get();
 	 }
 	
-	 public void create(Wallet wallet)
+	 public void create(PersonWallet wallet)
 	 {
 			wrepo.save(wallet);
 	 }	
 	 
-	public void update(Wallet wallet)
+	public void update(PersonWallet wallet)
 	{
 		wrepo.save(wallet);
 	}
 	
-
+// rename user wallet to person wallet
 	@Override
 	public BaseWallet debitMoney(BaseWallet wallet, double amount) {
-		Wallet userWallet=(Wallet) wallet;
+		PersonWallet userWallet=(PersonWallet) wallet;
 		logger.info("received debit request of amount {} from user wallet {}",amount,userWallet);
 		userWallet.setBalance(userWallet.getBalance()-amount);
 		update(userWallet);
@@ -54,11 +54,11 @@ public class UserWalletService implements MoneyMovementService {
 
 	@Override
 	public BaseWallet creditMoney(BaseWallet wallet, double amount) {
-		Wallet userWallet=(Wallet) wallet;
+		PersonWallet userWallet=(PersonWallet) wallet;
 		logger.info("received credit request of amount {} from user wallet {}",amount,userWallet);
 		userWallet.setBalance(userWallet.getBalance()+amount);
 		update(userWallet);
-		logger.info("merchant balance is {} after credit amount{}",userWallet.getBalance(),amount);
+		logger.info("user balance is {} after credit amount{}",userWallet.getBalance(),amount);
 		return userWallet;
 	}	
 

@@ -12,45 +12,45 @@ import org.springframework.web.bind.annotation.PostMapping;
 //import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.banti.wallet.ums.model.Wallet;
-import com.banti.wallet.ums.service.UserWalletService;
+import com.banti.wallet.ums.model.PersonWallet;
+import com.banti.wallet.ums.service.PersonWalletService;
 
 @RestController
-public class WalletController {
+public class PersonWalletController {
 	
 	@Autowired
-	private UserWalletService walletService;
+	private PersonWalletService walletService;
 	
 	@GetMapping("/wallets")
-	public ResponseEntity<List<Wallet>> listAll()
+	public ResponseEntity<List<PersonWallet>> listAll()
 	{
 		try
 		{
-	       List<Wallet> list= walletService.getAll();
-	         return new ResponseEntity<List<Wallet>>(list,HttpStatus.OK);
+	       List<PersonWallet> list= walletService.getAll();
+	         return new ResponseEntity<List<PersonWallet>>(list,HttpStatus.OK);
 		}
 		catch(NoSuchElementException e)
 		{
-			return new ResponseEntity<List<Wallet>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<List<PersonWallet>>(HttpStatus.NOT_FOUND);
 		}	
 	}
 	
 	@GetMapping("/wallet/get/{mobileNo}")
-	 public ResponseEntity<Wallet> fatchWallet(@PathVariable String mobileNo)
+	 public ResponseEntity<PersonWallet> fatchWallet(@PathVariable String mobileNo)
 	 {
 		try
 		{
-	       Wallet existWallet = walletService.get(mobileNo);
-	         return new ResponseEntity<Wallet>(existWallet,HttpStatus.OK);
+	       PersonWallet existWallet = walletService.get(mobileNo);
+	         return new ResponseEntity<PersonWallet>(existWallet,HttpStatus.OK);
 		}
 		catch(NoSuchElementException e)
 		{
-			return new ResponseEntity<Wallet>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<PersonWallet>(HttpStatus.NOT_FOUND);
 		}	
 	 }
 	 
 	@PostMapping("/wallet")
-	public String createWallet(@RequestBody Wallet wallet)
+	public String createWallet(@RequestBody PersonWallet wallet)
       {
 		wallet.setCreatedDate(new Date());
 		walletService.create(wallet);

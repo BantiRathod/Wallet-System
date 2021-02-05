@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class Wallet extends BaseWallet{
+public class PersonWallet extends BaseWallet{
     @Id
 	private String mobileNo;
 	private Double balance;

@@ -6,47 +6,53 @@ import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.banti.wallet.ums.enums.PersonStatus;
-import com.banti.wallet.ums.model.User;
-import com.banti.wallet.ums.repository.UserRepository;
-import com.banti.wallet.ums.requestEntities.UserRequestEntity;
+import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.repository.PersonRepository;
+import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
+
 
 @Service
 @Transactional
-public class UserService {
+public class PersonService {
 	
+	@Autowired
+	private PasswordEncoder bcryptEncoder;
     @Autowired
-    private UserRepository userRepo;
+    private PersonRepository personRepo;
     
-    public User findByMobileNo(String mobileNo) {
-       return userRepo.findByMobileNo(mobileNo);
+    public Person findByMobileNo(String mobileNo) {
+       return personRepo.findByMobileNo(mobileNo);
     }
     
-    public List<User> listAll() {
-        return userRepo.findAll();
+    public List<Person> listAll() {
+        return personRepo.findAll();
     }
      
-    public void updateUser(User user) throws NoSuchElementException
+    public void updateUser(Person user) throws NoSuchElementException
     {
-    	 User existUser =  userRepo.findById(user.getUserId()).get();
+    	 Person existUser =  personRepo.findById(user.getUserId()).get();
     
          existUser.setUserName(user.getUserName());                         
          existUser.setFirstName(user.getFirstName());                       
          existUser.setLastName(user.getLastName());                          
          existUser.setAddress(user.getAddress());
          existUser.setMobileNo(user.getMobileNo());
-         userRepo.save(existUser);
+         personRepo.save(existUser);
     }
     
-    public User saveUser(UserRequestEntity user) throws Exception{
+    public Person saveUser(PersonRequestEntity user) throws Exception{
     	
-        User existUser = userRepo.findByMobileNo(user.getMobileNo());
+        Person existUser = personRepo.findByMobileNo(user.getMobileNo());
         if(existUser!=null)
-        	throw new Exception("user is already exist"); 
+        	throw new Exception("person is already exist"); 
         
-    	User realUser = new User();	
+      
+    	Person realUser = new Person();	
+    	realUser.setPassword(bcryptEncoder.encode(user.getPassword()));          // save password in encrypted forms
     	realUser.setUserName(user.getUserName());
     	realUser.setAddress(user.getAddress());
     	realUser.setFirstName(user.getFirstName());
@@ -55,14 +61,19 @@ public class UserService {
     	realUser.setEmail(user.getEmail());
     	realUser.setRegisterDate(new Date());
     	realUser.setStatus(PersonStatus.ACTIVE.name());
-        return userRepo.save(realUser);
+        return personRepo.save(realUser);
     }
      
-    public User get(Long id) {
-        return userRepo.findById(id).get();
+    public Person get(Long id) {
+        return personRepo.findById(id).get();
     }
      
     public void delete(Long id) {
-        userRepo.deleteById(id);
+    	personRepo.deleteById(id);
+    }
+    
+    public Person findUserByUserName(String username)
+    {
+    	return personRepo.findUserByUserName(username);
     }
 }

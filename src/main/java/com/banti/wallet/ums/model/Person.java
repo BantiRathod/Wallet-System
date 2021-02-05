@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class User{
+public class Person{
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long userId;
@@ -19,6 +19,8 @@ public class User{
 	private String email;
     private String mobileNo; 
 	private String status;
+	private String password;
+	
 	public Long getUserId() {
 		return userId;
 	}
@@ -79,8 +81,14 @@ public class User{
 	@Override
 	public String toString() {
 		return "User [userId=" + userId + ", userName=" + userName + ", firstName=" + firstName + ", lastName="
-				+ lastName + ", address=" + address + ", registerDate=" + registerDate + ", email=" + email
+				+ lastName + ", address=" + address + ", registerDate=" + registerDate + ", email=" + email+", password="+password
 				+ ", mobileNo=" + mobileNo + ", status=" + status + "]";
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}	
 	
 	

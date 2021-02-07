@@ -28,7 +28,6 @@ import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
 
 @Service
-@Transactional
 public class TransactionService
 {
 	Logger logger=LoggerFactory.getLogger(TransactionService.class);
@@ -69,12 +68,14 @@ public class TransactionService
 		return trepo.save(transaction);
 	}
 
+	@Transactional
 	public WalletTransaction performP2M(TransactionRequest request, Map<String, Object> p2mContext) throws Exception {
 		logger.info("current context {}",p2mContext);
 		transactionBusinessValidator.p2mValidation(request, p2mContext);
 		logger.info("context after business validation {}",p2mContext);
 		WalletTransaction transaction = doMoneyTransfer(request, p2mContext);
 		//logger.info("context after money movement {}",p2mContext);
+		
 		WalletTransaction walletTransaction = createTransaction(request, transaction);
 		logger.info("generated transaction {}",walletTransaction);
 		return walletTransaction;	
@@ -92,7 +93,8 @@ public class TransactionService
 		return tempTransaction;
 	}
 
-	private WalletTransaction doMoneyTransfer(TransactionRequest request, Map<String, Object> p2mContext) {
+
+	private WalletTransaction doMoneyTransfer(TransactionRequest request, Map<String, Object> p2mContext) throws RuntimeException {
 		PersonWallet payerUserWallet = (PersonWallet) p2mContext.get(ContextConstant.USER_WALLET);
 		
 		WalletTransaction transaction = new WalletTransaction();
@@ -100,7 +102,10 @@ public class TransactionService
 		transaction.setPayerRemainingAmount(updatedPayerUserWallet.getBalance());
 
 		MerchantWallet payeeMerchantWallet = (MerchantWallet) p2mContext.get(ContextConstant.MERCHANT_WALLET);
-
+		Double i = 20d;
+		if(request.getAmount().equals(i)) {
+			throw new RuntimeException("transaction amt is 20 so exception");
+		}
 		MerchantWallet updateMerchantWallet = (MerchantWallet) merchantMoneyMovementService.creditMoney(payeeMerchantWallet, request.getAmount());
 		transaction.setPayeeRemainingAmount(updateMerchantWallet.getBalance());
 		return transaction;

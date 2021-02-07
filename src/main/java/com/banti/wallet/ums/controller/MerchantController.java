@@ -57,7 +57,7 @@ public ResponseEntity<List<Merchant>> listAll()
 	}	
  }
  
-@PostMapping("/merchant")
+@PostMapping("/merchantRegistration")
 public String createMerchantAccount(@RequestBody Merchant merchant )
   {
 	logger.info("merchant recieved {} ", merchant);

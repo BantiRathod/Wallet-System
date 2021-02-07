@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 public class PersonController 
 {
 	Logger logger=LoggerFactory.getLogger(PersonController.class);
+	
 	@Autowired                                                                     
 	private PersonService personService;                                             
 
@@ -43,7 +44,6 @@ public class PersonController
 	 //RESTful API for Create data
 	 @PostMapping("/Sign-Up")
 	 public ResponseEntity<String> registerPerson(@RequestBody PersonRequestEntity user) {
-	     logger.info("request received to save User {}",user);
 	     try
 	     {
 	    	 personService.saveUser(user);	 

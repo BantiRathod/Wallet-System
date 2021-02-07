@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import javax.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +135,7 @@ public class TransactionController {
 			transactionBusinessValidator.p2pValidation(request);
 
 			WalletTransaction transaction = doMoneyTransferToPerson(request);
-
+			
 			WalletTransaction tempTransaction = createTransactionP2P(request, transaction);
 
 			generateP2PResponse(request, transactionResponse, tempTransaction);
@@ -176,7 +178,8 @@ public class TransactionController {
 		return tempTransaction;
 	}
 
-	private WalletTransaction doMoneyTransferToPerson(TransactionRequest request) {
+	@Transactional
+	private WalletTransaction doMoneyTransferToPerson(TransactionRequest request) throws RuntimeException {
 
 		PersonWallet payerUserWallet = walletService.get(request.getPayerMobileNo());
 
@@ -190,14 +193,17 @@ public class TransactionController {
 
 		transaction.setPayerRemainingAmount(balance);
 
+		walletService.update(payerUserWallet);
+		Double i = 20d;
+		if(request.getAmount().equals(i)) {
+			throw new RuntimeException("amount is 20 so exception");
+		}
 		PersonWallet payeeUserWallet = walletService.get(request.getPayeeMobileNo());
-
 		balance = payeeUserWallet.getBalance();
 		balance += amount;
 		transaction.setPayeeRemainingAmount(balance);
 		payeeUserWallet.setBalance(balance);
-
-		walletService.update(payerUserWallet);
+		
 		walletService.update(payeeUserWallet);
 		return transaction;
 	}

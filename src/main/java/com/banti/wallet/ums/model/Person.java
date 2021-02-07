@@ -6,8 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.banti.wallet.ums.elasticsearch.baseInterfaces.BasePerson;
+
 @Entity
-public class Person{
+public class Person extends BasePerson{
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long userId;

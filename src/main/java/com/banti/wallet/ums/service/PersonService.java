@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.banti.wallet.ums.elasticsearch.repositories.ElasticPersonRepository;
 import com.banti.wallet.ums.enums.PersonStatus;
 import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.repository.PersonRepository;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
 
@@ -20,9 +22,14 @@ import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
 public class PersonService {
 	
 	@Autowired
+	private ElasticPersonRepository elasPersonRepository;
+	
+	@Autowired
 	private PasswordEncoder bcryptEncoder;
+	
     @Autowired
     private PersonRepository personRepo;
+    
     
     public Person findByMobileNo(String mobileNo) {
        return personRepo.findByMobileNo(mobileNo);
@@ -34,21 +41,25 @@ public class PersonService {
      
     public void updateUser(Person user) throws NoSuchElementException
     {
+    	
     	 Person existUser =  personRepo.findById(user.getUserId()).get();
-    
          existUser.setUserName(user.getUserName());                         
          existUser.setFirstName(user.getFirstName());                       
          existUser.setLastName(user.getLastName());                          
          existUser.setAddress(user.getAddress());
          existUser.setMobileNo(user.getMobileNo());
          personRepo.save(existUser);
+         
     }
     
-    public Person saveUser(PersonRequestEntity user) throws Exception{
+    public void saveUser(PersonRequestEntity user) throws Exception {
     	
-        Person existUser = personRepo.findByMobileNo(user.getMobileNo());
-        if(existUser!=null)
+    	//FATCH FROM ELASTICSEARCH DATABASE
+    	ElasticPerson existPerson = elasPersonRepository.findByMobileNo(user.getMobileNo());
+        //Person existUser = personRepo.findByMobileNo(user.getMobileNo());
+        if(existPerson!=null)
         	throw new Exception("person is already exist"); 
+        
         
       
     	Person realUser = new Person();	
@@ -61,7 +72,22 @@ public class PersonService {
     	realUser.setEmail(user.getEmail());
     	realUser.setRegisterDate(new Date());
     	realUser.setStatus(PersonStatus.ACTIVE.name());
-        return personRepo.save(realUser);
+    	// TO SAVE RECORD IN MYSQL DATABASE
+        personRepo.save(realUser); 
+        
+        ElasticPerson elasticPerson = new ElasticPerson();
+        elasticPerson.setUserName(user.getUserName());
+        elasticPerson.setAddress(user.getAddress());
+        elasticPerson.setEmail(user.getEmail());
+        elasticPerson.setFirstName(user.getFirstName());
+        elasticPerson.setLastName(user.getLastName());
+        elasticPerson.setMobileNo(user.getMobileNo());
+        elasticPerson.setPassword(bcryptEncoder.encode(user.getPassword()));
+        elasticPerson.setRegisterDate(new Date());
+        elasticPerson.setStatus(PersonStatus.ACTIVE.name());
+        // TO SAVE RECORD IN ELASTICSEARCH DATABASE
+        elasPersonRepository.save(elasticPerson);
+                                                                                              
     }
      
     public Person get(Long id) {

@@ -19,14 +19,14 @@ import com.banti.wallet.ums.service.PersonWalletService;
 public class PersonWalletController {
 	
 	@Autowired
-	private PersonWalletService walletService;
+	private PersonWalletService personWalletService;
 	
-	@GetMapping("/wallets")
+	@GetMapping("/personWallets")
 	public ResponseEntity<List<PersonWallet>> listAll()
 	{
 		try
 		{
-	       List<PersonWallet> list= walletService.getAll();
+	       List<PersonWallet> list= personWalletService.getAll();
 	         return new ResponseEntity<List<PersonWallet>>(list,HttpStatus.OK);
 		}
 		catch(NoSuchElementException e)
@@ -35,12 +35,12 @@ public class PersonWalletController {
 		}	
 	}
 	
-	@GetMapping("/wallet/get/{mobileNo}")
+	@GetMapping("/getPersonWallet/{mobileNo}")
 	 public ResponseEntity<PersonWallet> fatchWallet(@PathVariable String mobileNo)
 	 {
 		try
 		{
-	       PersonWallet existWallet = walletService.get(mobileNo);
+	       PersonWallet existWallet = personWalletService.get(mobileNo);
 	         return new ResponseEntity<PersonWallet>(existWallet,HttpStatus.OK);
 		}
 		catch(NoSuchElementException e)
@@ -49,11 +49,11 @@ public class PersonWalletController {
 		}	
 	 }
 	 
-	@PostMapping("/wallet")
+	@PostMapping("/personWallet")
 	public String createWallet(@RequestBody PersonWallet wallet)
       {
 		wallet.setCreatedDate(new Date());
-		walletService.create(wallet);
+		personWalletService.create(wallet);
 		return "new user wallet of "+wallet.getMobileNo()+" on "+ wallet.getCreatedDate() +" has heen created";
       }
 	

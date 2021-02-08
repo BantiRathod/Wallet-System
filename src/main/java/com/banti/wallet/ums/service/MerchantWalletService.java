@@ -14,6 +14,7 @@ import com.banti.wallet.ums.model.BaseWallet;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.repository.MerchantWalletRepository;
 import com.banti.wallet.ums.requestEntities.MerchantWalletRequest;
+import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
 
 @Service (value="merchantWalletService")
 @Transactional
@@ -30,7 +31,7 @@ public class MerchantWalletService implements MoneyMovementService
 		 return  elasticMerchantWalletRepository.findAll();
 	 }
 	 
-	 public  ElasticMerchantWallet get(String mobileNo)
+	 public  ElasticMerchantWallet getMerchantWallet(String mobileNo)
 	 {
 	  return   elasticMerchantWalletRepository.findById(mobileNo).get();
 	 }
@@ -44,48 +45,63 @@ public class MerchantWalletService implements MoneyMovementService
 			 
 		 if(merchantWallet.getMobileNo().length()!=10)
 			  throw new Exception("Invalid mobile No entered "+ merchantWallet.getMobileNo());
+		 MerchantWallet  tempmerchantWallet = new  MerchantWallet();
 		 
+		 tempmerchantWallet.setBalance(merchantWallet.getBalance());
+		 tempmerchantWallet.setMerchantWalletcreatedDate(new Date());
+		 tempmerchantWallet.setMobileNo(merchantWallet.getMobileNo());
+		 tempmerchantWallet.setStatus(AccountStatus.ENABLED.name());
+		 merchantWalletRepository.save(tempmerchantWallet);
 		 
 		 ElasticMerchantWallet  elasticMerchantWallet = new  ElasticMerchantWallet();
 		 elasticMerchantWallet.setBalance(merchantWallet.getBalance());
 		 elasticMerchantWallet.setMobileNo(merchantWallet.getMobileNo());
-		 elasticMerchantWallet.setMerchantWalletcreatedDate(new Date());
+		 elasticMerchantWallet.setMerchantWalletcreatedDate( tempmerchantWallet.getMerchantWalletcreatedDate());
 		 elasticMerchantWallet.setStatus(AccountStatus.ENABLED.name());
 		 elasticMerchantWalletRepository.save(elasticMerchantWallet);
-		 
-		 MerchantWallet  tempmerchantWallet = new  MerchantWallet();
-		 tempmerchantWallet.setBalance(merchantWallet.getBalance());
-		 tempmerchantWallet.setMerchantWalletcreatedDate(elasticMerchantWallet.getMerchantWalletcreatedDate());
-		 tempmerchantWallet.setMobileNo(merchantWallet.getMobileNo());
-		 tempmerchantWallet.setStatus(AccountStatus.ENABLED.name());
-		 
-		 merchantWalletRepository.save(tempmerchantWallet);
-		 
+		 	 
 	 }
 
-	public MerchantWallet update(MerchantWallet payeeMerchantWallet) {
-		return merchantWalletRepository.save(payeeMerchantWallet);
+	public void updateMerchantWallet(UpdateMerchantWalletRequest merchantWallet, String mobileNo) throws Exception 
+	{
+		ElasticMerchantWallet elasticMerchantWallet = elasticMerchantWalletRepository.findById(mobileNo).get();
+		 if(elasticMerchantWallet==null)
+		    	 throw new Exception("account not opened yet by this mobile number");
+		 
+		 if(mobileNo.length()!=10)
+			 throw new Exception("Invalid number passed, mobile no="+mobileNo);
+		 
+		 elasticMerchantWallet.setMobileNo(mobileNo);
+		 elasticMerchantWalletRepository.save( elasticMerchantWallet);
+		 
+		 MerchantWallet tempMerchantWallet = merchantWalletRepository.findById(mobileNo).get();
+		 tempMerchantWallet.setMobileNo(mobileNo);
+		 merchantWalletRepository.save(tempMerchantWallet);
 		
 	}
 
+	
 	@Override
 	public BaseWallet debitMoney(BaseWallet wallet, double amount) {     // What we did here
 		MerchantWallet merchantWallet=(MerchantWallet) wallet;
 		logger.info("received debit request of amount {} from merchant {}",amount,merchantWallet);
 		merchantWallet.setBalance(merchantWallet.getBalance()-amount);
-		MerchantWallet updatedMerchantWallet = update(merchantWallet);
-		logger.info("merchant balance is {} after deducting amount{}",updatedMerchantWallet.getBalance(),amount);
-		return updatedMerchantWallet;
+		//MerchantWallet updatedMerchantWallet = updateMerchantWallet(merchantWallet);
+		//logger.info("merchant balance is {} after deducting amount{}",updatedMerchantWallet.getBalance(),amount);
+		//return updatedMerchantWallet;
+		return merchantWallet;
 	}
 
 	@Override
 	public BaseWallet creditMoney(BaseWallet wallet, double amount) {
 		MerchantWallet merchantWallet=(MerchantWallet) wallet;
 		logger.info("received credit request of amount {} from merchant {}",amount,merchantWallet);
-		merchantWallet.setBalance(merchantWallet.getBalance()+amount);
-		MerchantWallet updatedMerchantWallet = update(merchantWallet);
-		logger.info("merchant balance is {} after crediting amount{}",updatedMerchantWallet.getBalance(),amount);
-		return updatedMerchantWallet;
+		 merchantWallet.setBalance(merchantWallet.getBalance()+amount);
+		 /* updatedMerchantWallet = updateMerchantWallet(merchantWallet);
+		 * logger.info("merchant balance is {} after crediting amount{}"
+		 * ,updatedMerchantWallet.getBalance(),amount);
+		 */
+		return merchantWallet;
 	}	
 
 }

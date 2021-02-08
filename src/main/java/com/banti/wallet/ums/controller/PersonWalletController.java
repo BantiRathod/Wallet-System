@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banti.wallet.ums.elasticsearch.models.ElasticPersonWallet;
-import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
+import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 import com.banti.wallet.ums.service.PersonWalletService;
 import com.banti.wallet.ums.validator.request.PersonWalletRequestValidator;
 
@@ -75,12 +75,12 @@ public class PersonWalletController {
      }	
 	
 	@PutMapping("/personWallet/{mobileNo}")
-	public ResponseEntity<String> updatePersonWallet(@RequestBody PersonWallet personWallet, @PathVariable String mobileNo)
+	public ResponseEntity<String> updatePersonWallet(@RequestBody UpdatePersonWalletRequest personWallet, @PathVariable String mobileNo)
 	{
 		try
 		{
-		 personWalletService.updatePersonWallet(personWallet);
-		 return new ResponseEntity<String>("person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);
+		 personWalletService.updatePersonWallet(personWallet, mobileNo);
+		 return new ResponseEntity<String>(" person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);
 	 }catch(Exception e)
 		{
 		  return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);

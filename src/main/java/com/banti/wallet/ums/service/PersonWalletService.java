@@ -16,6 +16,8 @@ import com.banti.wallet.ums.model.BaseWallet;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.repository.PersonWalletRepository;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
+import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
+import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 
 @Service(value="personWalletService")
 @Transactional
@@ -68,9 +70,9 @@ public class PersonWalletService implements MoneyMovementService {
 	}
 	
 	
-	public void updatePersonWallet(PersonWallet wallet) throws Exception
+	public void updatePersonWallet(UpdatePersonWalletRequest wallet, String mobileNo) throws Exception
 	{
-		 ElasticPersonWallet elasticPersonWallet  = elasticPersonWalletRepository.findById(wallet.getMobileNo()).get();
+		 ElasticPersonWallet elasticPersonWallet  = elasticPersonWalletRepository.findById(mobileNo).get();
 		 if(elasticPersonWallet==null)
 			 throw new Exception("NO PERSON WALLET EXIST OF THIS NUMBER ");
 		 
@@ -78,9 +80,10 @@ public class PersonWalletService implements MoneyMovementService {
 		 elasticPersonWallet.setMobileNo(wallet.getMobileNo());
 		 elasticPersonWalletRepository.save(elasticPersonWallet);
 		 
-		 PersonWallet personWallet = (PersonWallet)personWalletRepository.findById(wallet.getMobileNo()).get();
+		 
+		 PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
 		 personWallet.setMobileNo(wallet.getMobileNo());
-		 personWalletRepository.save(wallet);
+		 personWalletRepository.save(personWallet);
 	
 	}
 	
@@ -93,7 +96,12 @@ public class PersonWalletService implements MoneyMovementService {
 		personWallet.setBalance(personWallet.getBalance()-amount);
 		try
 		{
-		  updatePersonWallet(personWallet);
+		//HAD TO MADE CHANGE IN IN THIS METHOD, WE HAVE TO PASS UpdatePersonRequest object as a argu. instead of paersonWallet	
+		UpdatePersonWalletRequest updatePersonWalletRequest = new UpdatePersonWalletRequest(); 
+		updatePersonWalletRequest.setBalance(personWallet.getBalance());
+		//TO STORE MADE CHANGES IN DATABASES 	
+		updatePersonWallet(updatePersonWalletRequest,personWallet.getMobileNo());  
+		
 		}catch(Exception e)
 		{
 			logger.error(e.getMessage());
@@ -108,15 +116,21 @@ public class PersonWalletService implements MoneyMovementService {
 		PersonWallet personWallet=(PersonWallet) wallet;
 		logger.info("received credit request of amount {} from user wallet {}",amount,personWallet);
 		personWallet.setBalance(personWallet.getBalance()+amount);
+		
 		try
 		{
-		updatePersonWallet(personWallet);
+		//HAD TO MADE CHANGE IN IN THIS METHOD, WE HAVE TO PASS UpdatePersonRequest object as a argument instead of paersonWallet	
+		UpdatePersonWalletRequest updatePersonWalletRequest = new UpdatePersonWalletRequest(); 
+		updatePersonWalletRequest.setBalance(personWallet.getBalance());
+		//TO STORE MADE CHANGES IN DATABASES 	
+		updatePersonWallet(updatePersonWalletRequest,personWallet.getMobileNo());  
+		
 		}catch(Exception e)
 		{
 			logger.error(e.getMessage());
 		}
 		
-		logger.info("user balance is {} after credit amount{}",personWallet.getBalance(),amount);
+		logger.info("person balance is {} after credit amount{}",personWallet.getBalance(),amount);
 		return personWallet;
 	}
 

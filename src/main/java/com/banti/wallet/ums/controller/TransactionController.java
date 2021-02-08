@@ -49,21 +49,22 @@ public class TransactionController {
 	@Autowired
 	private TransactionBusinessValidator transactionBusinessValidator;
 	
-	//@Autowired
-	//private PaginationRequestValidator paginationRequestValidator;
+	@Autowired
+	private PaginationRequestValidator paginationRequestValidator;
+	
 	@Autowired
 	private PersonWalletService walletService;
 	@Autowired
-	private PersonService userService;
+	private PersonService personService;
 
 	@Autowired
 	private BankService bankService;
 
 	@GetMapping("transaction/summary")
-	public ResponseEntity<Page<WalletTransaction>> getTrans(@RequestBody PaginationRequest paginationRequest) {
+	public ResponseEntity<Page<WalletTransaction>> getTransactionSummary(@RequestBody PaginationRequest paginationRequest) {
 		logger.info("paginationRequest received {}", paginationRequest);
 		try {
-		//	paginationRequestValidator.summaryValidator(paginationRequest);
+			paginationRequestValidator.summaryValidator(paginationRequest);
 			Page<WalletTransaction> page = transactionService.listAll(paginationRequest);
 
 			logger.info("paginationResponse respond {}", page);

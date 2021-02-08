@@ -16,7 +16,6 @@ import com.banti.wallet.ums.model.BaseWallet;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.repository.PersonWalletRepository;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
 import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 
 @Service(value="personWalletService")
@@ -94,18 +93,7 @@ public class PersonWalletService implements MoneyMovementService {
 		
 		logger.info("received debit request of amount {} from user wallet {}",amount,personWallet);
 		personWallet.setBalance(personWallet.getBalance()-amount);
-		try
-		{
-		//HAD TO MADE CHANGE IN IN THIS METHOD, WE HAVE TO PASS UpdatePersonRequest object as a argu. instead of paersonWallet	
-		UpdatePersonWalletRequest updatePersonWalletRequest = new UpdatePersonWalletRequest(); 
-		updatePersonWalletRequest.setBalance(personWallet.getBalance());
-		//TO STORE MADE CHANGES IN DATABASES 	
-		updatePersonWallet(updatePersonWalletRequest,personWallet.getMobileNo());  
-		
-		}catch(Exception e)
-		{
-			logger.error(e.getMessage());
-		}
+		personWalletRepository.save(personWallet);
 		
 		logger.info("merchant balance is {} after deducting amount{}",personWallet.getBalance(),amount);
 		return personWallet;
@@ -116,20 +104,7 @@ public class PersonWalletService implements MoneyMovementService {
 		PersonWallet personWallet=(PersonWallet) wallet;
 		logger.info("received credit request of amount {} from user wallet {}",amount,personWallet);
 		personWallet.setBalance(personWallet.getBalance()+amount);
-		
-		try
-		{
-		//HAD TO MADE CHANGE IN IN THIS METHOD, WE HAVE TO PASS UpdatePersonRequest object as a argument instead of paersonWallet	
-		UpdatePersonWalletRequest updatePersonWalletRequest = new UpdatePersonWalletRequest(); 
-		updatePersonWalletRequest.setBalance(personWallet.getBalance());
-		//TO STORE MADE CHANGES IN DATABASES 	
-		updatePersonWallet(updatePersonWalletRequest,personWallet.getMobileNo());  
-		
-		}catch(Exception e)
-		{
-			logger.error(e.getMessage());
-		}
-		
+		personWalletRepository.save(personWallet);
 		logger.info("person balance is {} after credit amount{}",personWallet.getBalance(),amount);
 		return personWallet;
 	}

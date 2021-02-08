@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
 import com.banti.wallet.ums.service.PersonService;
-
-import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -24,20 +24,20 @@ public class PersonController
 	private PersonService personService;                                             
 
      //RESTful API for getting all users
-	 @GetMapping("/listOfPerson")
-	 public List<Person> list()
+	 @GetMapping("/Persons")
+	 public Iterable<ElasticPerson> fatchAllPerson()
 	 {
-	    return personService.listAll();
+	    return personService.listAllPerson();
 	 }
 	 
 	//RESTful API for getting the record particular user
-	 @GetMapping("/getPerson/{id}")
-	 public ResponseEntity<Person> get(@PathVariable Long id) {
+	 @GetMapping("/person/{id}")
+	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {
 	     try {
-	         Person person = personService.get(id);
-	         return new ResponseEntity<Person> (person, HttpStatus.OK);
+	    	 ElasticPerson person = personService.getPerson(id);
+	         return new ResponseEntity<ElasticPerson> (person, HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
-	         return new ResponseEntity<Person>(HttpStatus.NOT_FOUND);
+	         return new ResponseEntity<ElasticPerson>(HttpStatus.NOT_FOUND);
 	     }      
 	 }
 	
@@ -57,11 +57,12 @@ public class PersonController
 	 
 	 
 	// RESTful API for Update Operation
-	 @PutMapping("/updatePerson/{id}")
-	 public ResponseEntity<String> update(@RequestBody Person user, @PathVariable Long id) {
+	 @PutMapping("/person/{id}")
+	 public ResponseEntity<String> update(@RequestBody Person person, @PathVariable Long id) {
 	     try
 	     {
-	    	 personService.updateUser(user);
+	    	 logger.info("person received as a request body {}",person);
+	    	 personService.updatePerson(person);
 	         return new ResponseEntity<String>(" Record of the given id's person has been updated ",HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
 	         return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -69,18 +70,18 @@ public class PersonController
 	 } 
 	
 	// RESTful API for Delete Operation
-	 @DeleteMapping("/deletePerson/{id}")
-	 public ResponseEntity<Person> delete(@PathVariable Long id)
+	 @DeleteMapping("/person/{id}")
+	 public ResponseEntity<ElasticPerson> deletePersonUsingId(@PathVariable Long id)
 	 {
 		 try
 		 {
-		   Person user= personService.get(id);
-		   personService.delete(id);
-		   return new ResponseEntity<Person>(user,HttpStatus.OK);      
+		   ElasticPerson user= personService.getPerson(id);  
+		    personService.deletePerson(id);
+		   return new ResponseEntity<ElasticPerson>(user,HttpStatus.OK);      
 	     }
 		  catch(NoSuchElementException e)
 		  {
-			 return new ResponseEntity<Person>(HttpStatus.NOT_FOUND);
+			 return new ResponseEntity<ElasticPerson>(HttpStatus.NOT_FOUND);
 		  }
 	 }
 }

@@ -16,6 +16,7 @@ import com.banti.wallet.ums.elasticsearch.baseInterfaces.BasePerson;
 import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.repository.PersonRepository;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
+import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
 
 
 @Service
@@ -41,26 +42,28 @@ public class PersonService extends BasePerson {
     }
     
     //TO UPDATE PERSON RECORD
-    public void updatePerson(Person person) throws NoSuchElementException
+    public void updatePerson(UpdatePersonRequest person, Long id) throws NoSuchElementException
     {
     	
-    	 ElasticPerson elasaticPerson = elasPersonRepository.findById(person.getUserId()).get();
+    	 ElasticPerson elasaticPerson = elasPersonRepository.findById(id).get();
     	 
     	 elasaticPerson.setUserName(person.getUserName());                         
     	 elasaticPerson.setFirstName(person.getFirstName());                       
     	 elasaticPerson.setLastName(person.getLastName());                          
     	 elasaticPerson.setAddress(person.getAddress());
     	 elasaticPerson.setMobileNo(person.getMobileNo());
-    	 elasPersonRepository.save( elasaticPerson);
+    	 elasaticPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
+    	 elasPersonRepository.save(elasaticPerson);
     	 
-    	 Person existUser =  personRepo.findById(person.getUserId()).get();
+    	 Person existPerson =  personRepo.findById(id).get();
     	 
-         existUser.setUserName(person.getUserName());                         
-         existUser.setFirstName(person.getFirstName());                       
-         existUser.setLastName(person.getLastName());                          
-         existUser.setAddress(person.getAddress());
-         existUser.setMobileNo(person.getMobileNo());
-         personRepo.save(existUser);
+         existPerson.setUserName(person.getUserName());                         
+         existPerson.setFirstName(person.getFirstName());                       
+         existPerson.setLastName(person.getLastName());                          
+         existPerson.setAddress(person.getAddress());
+         existPerson.setMobileNo(person.getMobileNo());
+         existPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
+         personRepo.save(existPerson);
          
     }
     

@@ -22,9 +22,9 @@ import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.model.WalletTransaction;
-import com.banti.wallet.ums.pagination.PaginationRequest;
 import com.banti.wallet.ums.repository.TransactionRepository;
-import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
+import com.banti.wallet.ums.requestEntities.PaginationRequest;
+import com.banti.wallet.ums.requestEntities.TransactionRequest;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
 
 @Service

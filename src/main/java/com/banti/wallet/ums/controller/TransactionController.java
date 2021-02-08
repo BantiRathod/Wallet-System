@@ -27,14 +27,14 @@ import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.model.WalletTransaction;
-import com.banti.wallet.ums.pagination.PaginationRequest;
+import com.banti.wallet.ums.requestEntities.PaginationRequest;
+import com.banti.wallet.ums.requestEntities.TransactionRequest;
+import com.banti.wallet.ums.responseEntities.TransactionResponse;
 import com.banti.wallet.ums.service.BankService;
 
 import com.banti.wallet.ums.service.TransactionService;
 import com.banti.wallet.ums.service.PersonService;
 import com.banti.wallet.ums.service.PersonWalletService;
-import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
-import com.banti.wallet.ums.transactionClassesToPayment.TransactionResponse;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
 import com.banti.wallet.ums.validator.request.PaginationRequestValidator;
 import com.banti.wallet.ums.validator.request.TransactionRequestValidator;

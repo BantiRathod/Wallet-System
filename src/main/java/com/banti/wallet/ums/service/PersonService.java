@@ -2,7 +2,6 @@ package com.banti.wallet.ums.service;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
@@ -108,12 +107,13 @@ public class PersonService extends BasePerson {
     }
      
     public void deletePerson(Long id) throws NoSuchElementException {
+    	elasPersonRepository.deleteById(id);
     	personRepo.deleteById(id);
     }
     
-    public Person findUserByUserName(String username)
+    public ElasticPerson findUserByUserName(String username)
     {
-    	return personRepo.findUserByUserName(username);
+    	return elasPersonRepository.findUserByUserName(username);
     }
     
 

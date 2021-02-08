@@ -8,4 +8,6 @@ public interface ElasticPersonRepository extends ElasticsearchRepository<Elastic
 
 	ElasticPerson findByMobileNo(String mobileNo);
 
+	ElasticPerson findUserByUserName(String username);
+
 }

@@ -1,4 +1,4 @@
-package com.banti.wallet.ums.pagination;
+package com.banti.wallet.ums.requestEntities;
 
 public class PaginationRequest {
        private Long userId;

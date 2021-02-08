@@ -1,6 +1,6 @@
 package com.banti.wallet.ums.validator.request;
 
-import com.banti.wallet.ums.transactionClassesToPayment.TransactionRequest;
+import com.banti.wallet.ums.requestEntities.TransactionRequest;
 
 public class TransactionRequestValidator {
 	

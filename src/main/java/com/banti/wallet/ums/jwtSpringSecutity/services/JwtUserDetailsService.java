@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.service.PersonService;
 
 
@@ -25,7 +25,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
 		
-	Person user = userService.findUserByUserName(username);
+	ElasticPerson user = userService.findUserByUserName(username);
 		//String pass = bcryptEncoder.encode(user.getPassword());
 	
 	  logger.info("user received from database {}", user);

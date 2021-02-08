@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
+import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
 import com.banti.wallet.ums.service.PersonService;
 import java.util.NoSuchElementException;
 
@@ -58,11 +59,11 @@ public class PersonController
 	 
 	// RESTful API for Update Operation
 	 @PutMapping("/person/{id}")
-	 public ResponseEntity<String> update(@RequestBody Person person, @PathVariable Long id) {
+	 public ResponseEntity<String> update(@RequestBody UpdatePersonRequest person,@PathVariable Long id) {
 	     try
 	     {
 	    	 logger.info("person received as a request body {}",person);
-	    	 personService.updatePerson(person);
+	    	 personService.updatePerson(person,id);
 	         return new ResponseEntity<String>(" Record of the given id's person has been updated ",HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
 	         return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);

@@ -1,7 +1,5 @@
 package com.banti.wallet.ums.controller;
 
-import java.util.Date;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
@@ -12,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.banti.wallet.ums.model.Merchant;
+import com.banti.wallet.ums.elasticsearch.models.ElasticMerchant;
+import com.banti.wallet.ums.requestEntities.MerchantRequest;
+import com.banti.wallet.ums.requestEntities.UpdateMerchantRequest;
 import com.banti.wallet.ums.service.MerchantService;
 
 
@@ -29,40 +30,60 @@ private MerchantService merchantService;
 
 
 @GetMapping("/merchants")
-public ResponseEntity<List<Merchant>> listAll()
+public ResponseEntity<Iterable<ElasticMerchant>> toGetlistOfAllMerchants()
 {
 	try
 	{
-       List<Merchant> list=merchantService.getAll();
-            return new ResponseEntity<List<Merchant>>(list,HttpStatus.OK);
+       Iterable<ElasticMerchant> list=merchantService.getListOfAllMerchants();
+            return new ResponseEntity<Iterable<ElasticMerchant>>(list,HttpStatus.OK);
 	}
 	catch(NoSuchElementException e)
 	{
-		return new ResponseEntity<List<Merchant>>(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<Iterable<ElasticMerchant>>(HttpStatus.NOT_FOUND);
 	}	
 }
 
 @GetMapping("/merchant/{id}")
- public ResponseEntity<Merchant> fatchWallet(@PathVariable Long id)
+ public ResponseEntity< ElasticMerchant > fatchWallet(@PathVariable Long id)
  {
-	
 	try
 	{
-       Merchant merchant = merchantService.get(id);
-         return new ResponseEntity<Merchant>(merchant,HttpStatus.OK);
+         ElasticMerchant merchant = merchantService.getMerchant(id);
+         return new ResponseEntity< ElasticMerchant >(merchant,HttpStatus.OK);
 	}
-	catch(NoSuchElementException e)
+	catch(Exception e)
 	{
-		return new ResponseEntity<Merchant>(HttpStatus.NOT_FOUND);
+		logger.error(e.getMessage());
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}	
  }
  
-@PostMapping("/merchantRegistration")
-public String createMerchantAccount(@RequestBody Merchant merchant )
+    @PostMapping("/merchant")
+    public String toMerchantRegistration(@RequestBody MerchantRequest merchant )
   {
-	logger.info("merchant recieved {} ", merchant);
-	 merchant.setRegisterDate(new Date());
-	 merchantService.createOrUpdate(merchant);
+	 logger.info("merchantRequest  recieved {} ", merchant);
+	 try
+	 {
+	 merchantService.createMerchantAccount(merchant);
 	 return " New merchant account has been created, shopName is "+merchant.getShopName();
+	 }catch(Exception e)
+	 {
+		return "Exception occured "+ e.getMessage();
+	 }
   }
+
+@PutMapping("/merchant/{id}")
+public String toUpdateMerchantAccount(@RequestBody 	UpdateMerchantRequest merchant ,@ PathVariable Long id)
+{
+	try
+	{
+		merchantService.updateMerchantAccount(merchant, id);
+		return " Merchant record has been updated";
+	}catch(Exception e)
+	{
+		return "run time exception occured "+e.getMessage();
+	}
+	
+}
+
 }

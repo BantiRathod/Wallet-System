@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banti.wallet.ums.constant.ContextConstant;
+import com.banti.wallet.ums.elasticsearch.models.ElasticWalletTransaction;
 import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.Bank;
 import com.banti.wallet.ums.model.Merchant;
@@ -36,6 +37,7 @@ import com.banti.wallet.ums.service.TransactionService;
 import com.banti.wallet.ums.service.PersonService;
 import com.banti.wallet.ums.service.PersonWalletService;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
+import com.banti.wallet.ums.validator.request.PaginationRequestValidation;
 import com.banti.wallet.ums.validator.request.PaginationRequestValidator;
 import com.banti.wallet.ums.validator.request.TransactionRequestValidator;
 
@@ -53,33 +55,33 @@ public class TransactionController {
 	private PaginationRequestValidator paginationRequestValidator;
 	
 	@Autowired
-	private PersonWalletService walletService;
+	private PersonWalletService personWalletService;
 	@Autowired
 	private PersonService personService;
 
 	@Autowired
 	private BankService bankService;
 
-	@GetMapping("transaction/summary")
-	public ResponseEntity<Page<WalletTransaction>> getTransactionSummary(@RequestBody PaginationRequest paginationRequest) {
+	@GetMapping("/transactionSummary")
+	public ResponseEntity<Iterable<ElasticWalletTransaction>> getTransactionSummary(@RequestBody PaginationRequest paginationRequest) {
 		logger.info("paginationRequest received {}", paginationRequest);
 		try {
-			paginationRequestValidator.summaryValidator(paginationRequest);
-			Page<WalletTransaction> page = transactionService.listAll(paginationRequest);
-
+			paginationRequestValidator.paginationRequestValidation(paginationRequest);
+			
+			Iterable<ElasticWalletTransaction> page = transactionService.getListOfAllTransaction(paginationRequest);
 			logger.info("paginationResponse respond {}", page);
-			return new ResponseEntity<Page<WalletTransaction>>(page, HttpStatus.OK);
+			return new ResponseEntity<Iterable<ElasticWalletTransaction>>(page, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
-			return new ResponseEntity<Page<WalletTransaction>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Iterable<ElasticWalletTransaction>>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return new ResponseEntity<Page<WalletTransaction>>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<Iterable<ElasticWalletTransaction>>(HttpStatus.NOT_FOUND);
 		} 
 	}
 
-	@GetMapping("transaction/status/{id}")
-	public ResponseEntity<String> getStatus(@PathVariable Long id) {
+	@GetMapping("/transactionStatus/{id}")
+	public ResponseEntity<String> getTransactionStatus(@PathVariable Long id) {
 		try {
-			String status = transactionService.getTransaction(id).getStatus();
+			String status = transactionService.getStatus(id);
 			return new ResponseEntity<String>(status, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
@@ -93,6 +95,7 @@ public class TransactionController {
 
 		TransactionResponse transactionResponse = new TransactionResponse();
 		Map<String, Object> p2mContext = new HashMap<>();
+		
 		try {
 			TransactionRequestValidator.p2mRequestValidator(request);
 			WalletTransaction tempTransaction = transactionService.performP2M(request, p2mContext);
@@ -110,14 +113,15 @@ public class TransactionController {
 
 	private void generateP2MResponse(TransactionRequest request, TransactionResponse transactionResponse,
 			Map<String, Object> p2mContext, WalletTransaction tempTransaction) {
-		Person payerUser = (Person) p2mContext.get(ContextConstant.USER_ACCOUNT);
+		
+		Person payerUser = (Person) p2mContext.get(ContextConstant.PERSON_ACCOUNT);
 		Merchant payeeMerchant = (Merchant) p2mContext.get(ContextConstant.MERCHANT_ACCOUNT);
 
 		transactionResponse.setTransactionType(TxnType.P2M.name());
 		transactionResponse.setPayerName(payerUser.getFirstName());
 		transactionResponse.setPayeeName(payeeMerchant.getShopName());
 		transactionResponse.setMessage("Transaction Successful");
-		transactionResponse.setDate(new Date());
+		transactionResponse.setDate(tempTransaction.getTransactionDate());
 		transactionResponse.setId(tempTransaction.getId());
 		transactionResponse.setOrderId(request.getOrderId());
 	}
@@ -195,10 +199,10 @@ public class TransactionController {
 		transaction.setPayerRemainingAmount(balance);
 
 		walletService.update(payerUserWallet);
-		Double i = 20d;
-		if(request.getAmount().equals(i)) {
-			throw new RuntimeException("amount is 20 so exception");
-		}
+		/*//FOR TRANSACTIONAL PART
+		 * Double i = 20d; if(request.getAmount().equals(i)) { throw new
+		 * RuntimeException("amount is 20 so exception"); }
+		 */
 		PersonWallet payeeUserWallet = walletService.get(request.getPayeeMobileNo());
 		balance = payeeUserWallet.getBalance();
 		balance += amount;

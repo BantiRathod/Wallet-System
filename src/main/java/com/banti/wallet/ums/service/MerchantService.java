@@ -13,6 +13,8 @@ import com.banti.wallet.ums.elasticsearch.repositories.ElasticMerchantRepository
 import com.banti.wallet.ums.enums.PersonStatus;
 import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.repository.MerchantRepository;
+import com.banti.wallet.ums.requestEntities.MerchantRequest;
+import com.banti.wallet.ums.requestEntities.UpdateMerchantRequest;
 
 @Service
 @Transactional
@@ -30,8 +32,10 @@ public class MerchantService
 		 return  elasticMerchantRepository.findAll();
 	 }
 	 
-	 public ElasticMerchant getMerchant(Long id)
+	 public ElasticMerchant getMerchant(Long id) throws Exception
 	 {
+	  if(id<0)
+		  throw new Exception("Invalid or negative id entered or negative , "+id);
 	  return elasticMerchantRepository.findById(id).get();
 	 }
 	
@@ -40,8 +44,12 @@ public class MerchantService
 			return elasticMerchantRepository.findByMobileNo(payeeMobileNo);
 	}	
 		
-	 public void createMerchantAccount(Merchant merchant)
+	 public void createMerchantAccount(MerchantRequest merchant) throws Exception
 	 {
+		
+		 if(elasticMerchantRepository.findByMobileNo(merchant.getMobileNo())!=null)
+			  throw new Exception("Merchant account is already exist with this mobile number"+merchant.getMobileNo());
+		 
 		 Merchant tempMerchant = new Merchant();
 		 tempMerchant.setMobileNo(merchant.getMobileNo());
 		 tempMerchant.setAddress(merchant.getAddress());
@@ -50,27 +58,28 @@ public class MerchantService
 		 tempMerchant.setRegisterDate(new Date());
 		 tempMerchant.setStatus(PersonStatus.ACTIVE.name());
 		 // MERCHANT RECORD HAS BEEN STORED IN MYSQL
-		 tempMerchant = merchantRepository.save(merchant);
+		Merchant returnMerchant = merchantRepository.save(tempMerchant);
+		
 		 
-		 ElasticMerchant elasticMerchant = new ElasticMerchant();
-		 elasticMerchant.setMobileNo(merchant.getMobileNo());
+		ElasticMerchant elasticMerchant = new ElasticMerchant();
 		 elasticMerchant.setAddress(merchant.getAddress());
 		 elasticMerchant.setEmail(merchant.getEmail());
+		 elasticMerchant.setMobileNo(merchant.getMobileNo());
 		 elasticMerchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
-		 elasticMerchant.setRegisterDate(new Date());
+		 elasticMerchant.setShopName(merchant.getShopName());
 		 elasticMerchant.setStatus(PersonStatus.ACTIVE.name());
-		 elasticMerchant.setMerchantId(tempMerchant.getMerchantId());
+		 elasticMerchant.setMerchantId( returnMerchant.getMerchantId());
 		 // MERCHANT RECORD HAS BEEN STORED IN ELASTICSEARCH DATABASE
 		 elasticMerchantRepository.save(elasticMerchant);
 	 
 	 }
 
-	 public void updateMerchantAccount(Merchant merchant) throws NoSuchElementException
+	 public void updateMerchantAccount(UpdateMerchantRequest merchant, Long id) throws NoSuchElementException
 	 {
-		 ElasticMerchant elasticMerchant = elasticMerchantRepository.findById(merchant.getMerchantId()).get();
+		 ElasticMerchant elasticMerchant = elasticMerchantRepository.findById(id).get();
 		 
 		 if(elasticMerchant==null)
-			  throw new NoSuchElementException("mrchant is exist of this id="+ merchant.getMerchantId());
+			  throw new NoSuchElementException("mrchant is exist of this id="+ id);
 		 
 		 elasticMerchant.setAddress(merchant.getAddress());
 		 elasticMerchant.setEmail(merchant.getEmail());
@@ -80,16 +89,15 @@ public class MerchantService
 		 
 		 elasticMerchantRepository.save(elasticMerchant);
 		 
-		 merchant.setAddress(merchant.getAddress());
-		 merchant.setEmail(merchant.getEmail());
-		 merchant.setMobileNo(merchant.getMobileNo());
-		 merchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
-		 merchant.setShopName(merchant.getShopName());
+		 //HERE WE WILL UPDATE ONLY THOSE FIELDS WHICH ARE UPDATABLE 
+		 Merchant tempmarchant = merchantRepository.findById(id).get();
+		 tempmarchant.setAddress(merchant.getAddress());
+		 tempmarchant.setEmail(merchant.getEmail());
+		 tempmarchant.setMobileNo(merchant.getMobileNo());
+		 tempmarchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
+		 tempmarchant.setShopName(merchant.getShopName());
 		 
-		 merchantRepository.save(merchant);
-		 
-		 
-		 
+		 merchantRepository.save(tempmarchant); 
 	 }
 	 public void deleteMerchantAccount(Long id)
 	 {

@@ -28,7 +28,7 @@ public class PersonService  {
 	private PasswordEncoder bcryptEncoder;
 	
     @Autowired
-    private PersonRepository personRepo;
+    private PersonRepository personRepository;
     
     
     public ElasticPerson findByMobileNo(String mobileNo) {
@@ -39,11 +39,30 @@ public class PersonService  {
         return elasPersonRepository.findAll();
     }
     
+    public ElasticPerson getPerson(Long id) {
+        return elasPersonRepository.findById(id).get();
+    }
+     
+    public void deletePerson(Long id) throws NoSuchElementException {
+    	elasPersonRepository.deleteById(id);
+    	personRepository.deleteById(id);
+    }
+    
+    public ElasticPerson findUserByUserName(String username)
+    {
+    	return elasPersonRepository.findUserByUserName(username);
+    }
+
+	public Person getPersonMysql(Long id) {
+		return personRepository.findById(id).get();
+	}
     //TO UPDATE PERSON RECORD
-    public void updatePerson(UpdatePersonRequest person, Long id) throws NoSuchElementException
+    public void updatePerson(UpdatePersonRequest person, Long id) throws Exception
     {
     	
     	 ElasticPerson elasaticPerson = elasPersonRepository.findById(id).get();
+    	 if(elasaticPerson==null)
+    		  throw new Exception("User is not exist with of Id number ");
     	 
     	 elasaticPerson.setUserName(person.getUserName());                         
     	 elasaticPerson.setFirstName(person.getFirstName());                       
@@ -53,7 +72,7 @@ public class PersonService  {
     	 elasaticPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
     	 elasPersonRepository.save(elasaticPerson);
     	 
-    	 Person existPerson =  personRepo.findById(id).get();
+    	 Person existPerson =  personRepository.findById(id).get();
     	 
          existPerson.setUserName(person.getUserName());                         
          existPerson.setFirstName(person.getFirstName());                       
@@ -61,7 +80,7 @@ public class PersonService  {
          existPerson.setAddress(person.getAddress());
          existPerson.setMobileNo(person.getMobileNo());
          existPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
-         personRepo.save(existPerson);
+         personRepository.save(existPerson);
          
     }
     
@@ -70,8 +89,9 @@ public class PersonService  {
     {
     	
     	//FATCH FROM ELASTICSEARCH DATABASE
-    	ElasticPerson existPerson = elasPersonRepository.findByMobileNo(user.getMobileNo());
-        //Person existUser = personRepo.findByMobileNo(user.getMobileNo());
+    	Person existPerson = personRepository.findByMobileNo(user.getMobileNo());
+       
+    	//TO CHECK THAT WHEATHER THE PERSON EXIST OR NOT 
         if(existPerson!=null)
         	throw new Exception("person is already exist"); 
         
@@ -85,8 +105,9 @@ public class PersonService  {
     	realUser.setEmail(user.getEmail());
     	realUser.setRegisterDate(new Date());
     	realUser.setStatus(PersonStatus.ACTIVE.name());
+    	
     	//TO SAVE RECORD IN MYSQL DATABASE
-    	personRepo.save(realUser);
+    	personRepository.save(realUser);
         
         ElasticPerson elasticPerson = new ElasticPerson();
         elasticPerson.setUserName(user.getUserName());
@@ -96,26 +117,12 @@ public class PersonService  {
         elasticPerson.setLastName(user.getLastName());
         elasticPerson.setMobileNo(user.getMobileNo());
         elasticPerson.setPassword(bcryptEncoder.encode(user.getPassword()));
-        elasticPerson.setRegisterDate(new Date());
+        elasticPerson.setRegisterDate(realUser.getRegisterDate());
         elasticPerson.setStatus(PersonStatus.ACTIVE.name());
+        
         // TO SAVE RECORD IN ELASTICSEARCH DATABASE
         elasPersonRepository.save(elasticPerson);
                                                                                               
     }
-     
-    public ElasticPerson getPerson(Long id) {
-        return elasPersonRepository.findById(id).get();
-    }
-     
-    public void deletePerson(Long id) throws NoSuchElementException {
-    	elasPersonRepository.deleteById(id);
-    	personRepo.deleteById(id);
-    }
     
-    public ElasticPerson findUserByUserName(String username)
-    {
-    	return elasPersonRepository.findUserByUserName(username);
-    }
-    
-
 }

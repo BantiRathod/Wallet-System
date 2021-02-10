@@ -2,7 +2,8 @@ package com.banti.wallet.ums.elasticsearch.models;
 
 import java.util.Date;
 
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -14,7 +15,7 @@ public class ElasticMerchantWallet {
     private String mobileNo;
 	@Field(type=FieldType.Double, name="balance")
     private Double balance;
-	@Field(type=FieldType.Double, name="registerDate")
+	 @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", name="registerDate")
     private Date registerDate;
 	@Field(type=FieldType.Text, name="status")
     private String status;

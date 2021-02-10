@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-//import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,6 +61,7 @@ public class PersonWalletController {
 		}	
 	 }
 	 
+	
 	@PostMapping("/personWallet")
 	public String createWallet(@RequestBody PersonWalletRequest wallet)
       {
@@ -77,12 +77,13 @@ public class PersonWalletController {
 		}
      }	
 	
+	
 	@PutMapping("/personWallet/{mobileNo}")
 	public ResponseEntity<String> updatePersonWallet(@RequestBody UpdatePersonWalletRequest personWallet, @PathVariable String mobileNo)
 	{
 		try
 		{
-			// TO VALIDATE NEW passed MOBILENO
+		  // TO VALIDATE NEW passed MOBILENO
 		  personWalletRequestValidator.personWalletMobileNoValidation(personWallet,mobileNo);
 		  personWalletService.updatePersonWallet(personWallet, mobileNo);
 		  return new ResponseEntity<String>(" person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);

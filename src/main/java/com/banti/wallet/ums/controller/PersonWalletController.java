@@ -23,7 +23,9 @@ import com.banti.wallet.ums.validator.request.PersonWalletRequestValidator;
 
 @RestController
 public class PersonWalletController {
+	
 	Logger logger = LoggerFactory.getLogger(PersonWalletController.class);
+	
 	@Autowired
 	private PersonWalletService personWalletService;
 	
@@ -50,10 +52,11 @@ public class PersonWalletController {
 		logger.info("mobileNo received from user {}", mobileNo);
 		try
 		{
-	       ElasticPersonWallet existWallet = personWalletService.getPersonWallet(mobileNo);
+			personWalletRequestValidator.personWalletMobileNoValidation(null , mobileNo);
+	         ElasticPersonWallet existWallet = personWalletService.getPersonWallet(mobileNo);
 	         return new ResponseEntity<ElasticPersonWallet>(existWallet,HttpStatus.OK);
 		}
-		catch(NoSuchElementException e)
+		catch(Exception e)
 		{
 			return new ResponseEntity<ElasticPersonWallet>(HttpStatus.NOT_FOUND);
 		}	
@@ -65,7 +68,7 @@ public class PersonWalletController {
 		logger.info("PersonWalletRequest received from user {}", wallet);
 		  try
 		 {
-		   personWalletRequestValidator.personWalletRequestValidation(wallet);
+		   personWalletRequestValidator.personWalletRequestBodyValidation(wallet);
 		   personWalletService.createPersonWallet(wallet);	
 		   return "new person wallet has heen created with  "+ wallet.getMobileNo()+" mobileNo";
       }catch(Exception e)
@@ -79,11 +82,13 @@ public class PersonWalletController {
 	{
 		try
 		{
-		 personWalletService.updatePersonWallet(personWallet, mobileNo);
-		 return new ResponseEntity<String>(" person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);
+			// TO VALIDATE NEW passed MOBILENO
+		  personWalletRequestValidator.personWalletMobileNoValidation(personWallet,mobileNo);
+		  personWalletService.updatePersonWallet(personWallet, mobileNo);
+		  return new ResponseEntity<String>(" person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);
 	 }catch(Exception e)
 		{
-		  return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
+		  return new ResponseEntity<>("Exception occured, "+e.getMessage(),HttpStatus.OK);
 		}
 	}
 }

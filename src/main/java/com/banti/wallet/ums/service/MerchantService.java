@@ -1,8 +1,6 @@
 package com.banti.wallet.ums.service;
 
 import java.util.Date;
-import java.util.NoSuchElementException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,11 +13,15 @@ import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.repository.MerchantRepository;
 import com.banti.wallet.ums.requestEntities.MerchantRequest;
 import com.banti.wallet.ums.requestEntities.UpdateMerchantRequest;
+import com.banti.wallet.ums.validator.business.MerchantBusinessValidator;
 
 @Service
 @Transactional
 public class MerchantService
 {
+  
+  @Autowired
+  private MerchantBusinessValidator merchantBusinessValidator;
   @Autowired
   private PasswordEncoder bcrptEncoder;
   @Autowired
@@ -34,24 +36,34 @@ public class MerchantService
 	 
 	 public ElasticMerchant getMerchant(Long id) throws Exception
 	 {
-	  if(id<0)
-		  throw new Exception("Invalid or negative id entered or negative , "+id);
-	  return elasticMerchantRepository.findById(id).get();
+	      return elasticMerchantRepository.findById(id).get();
 	 }
 	
 
 	public ElasticMerchant findByMobileNo(String payeeMobileNo) {
 			return elasticMerchantRepository.findByMobileNo(payeeMobileNo);
-	}	
+	 }	
+	
+	 public void deleteMerchantAccount(Long id)
+	 {
+		 merchantRepository.deleteById(id);
+		 elasticMerchantRepository.deleteById(id);		 
+	 }
+
+	public Merchant getMerchantFromMysql(Long id) {
+		return merchantRepository.findById(id).get();
+	}
 		
+	
 	 public void createMerchantAccount(MerchantRequest merchant) throws Exception
 	 {
+		 // TO BUSINESS VALIDATION
+		 merchantBusinessValidator.createMerchantValidation(merchant);
 		
-		 if(elasticMerchantRepository.findByMobileNo(merchant.getMobileNo())!=null)
-			  throw new Exception("Merchant account is already exist with this mobile number"+merchant.getMobileNo());
 		 
 		 Merchant tempMerchant = new Merchant();
 		 tempMerchant.setMobileNo(merchant.getMobileNo());
+		 tempMerchant.setShopName(merchant.getShopName());
 		 tempMerchant.setAddress(merchant.getAddress());
 		 tempMerchant.setEmail(merchant.getEmail());
 		 tempMerchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
@@ -63,6 +75,7 @@ public class MerchantService
 		 
 		ElasticMerchant elasticMerchant = new ElasticMerchant();
 		 elasticMerchant.setAddress(merchant.getAddress());
+		 elasticMerchant.setRegisterDate(tempMerchant.getRegisterDate());
 		 elasticMerchant.setEmail(merchant.getEmail());
 		 elasticMerchant.setMobileNo(merchant.getMobileNo());
 		 elasticMerchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
@@ -74,13 +87,14 @@ public class MerchantService
 	 
 	 }
 
-	 public void updateMerchantAccount(UpdateMerchantRequest merchant, Long id) throws NoSuchElementException
+	 
+	 
+	 public void updateMerchantAccount(UpdateMerchantRequest merchant, Long id) throws Exception
 	 {
-		 ElasticMerchant elasticMerchant = elasticMerchantRepository.findById(id).get();
+		 //BUSINESS VALIDATION
+		 merchantBusinessValidator.updateMerchantvalidation(merchant, id);
 		 
-		 if(elasticMerchant==null)
-			  throw new NoSuchElementException("mrchant is exist of this id="+ id);
-		 
+		 ElasticMerchant elasticMerchant = new ElasticMerchant();
 		 elasticMerchant.setAddress(merchant.getAddress());
 		 elasticMerchant.setEmail(merchant.getEmail());
 		 elasticMerchant.setMobileNo(merchant.getMobileNo());
@@ -99,10 +113,6 @@ public class MerchantService
 		 
 		 merchantRepository.save(tempmarchant); 
 	 }
-	 public void deleteMerchantAccount(Long id)
-	 {
-		 merchantRepository.deleteById(id);
-		 elasticMerchantRepository.deleteById(id);		 
-	 }
+	
    
 }

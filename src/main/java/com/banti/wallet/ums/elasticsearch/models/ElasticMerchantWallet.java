@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName="ElasticMerchantWallet",shards=1)
+@Document(indexName="elastic_merchant_wallet",shards=1)
 public class ElasticMerchantWallet {
 	
 	@Id

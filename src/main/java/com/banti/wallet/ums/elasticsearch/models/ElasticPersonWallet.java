@@ -3,6 +3,7 @@ package com.banti.wallet.ums.elasticsearch.models;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -16,7 +17,7 @@ public class ElasticPersonWallet {
 	private Double balance;
     @Field(type = FieldType.Text, name = "status")
 	private String status;
-    @Field(type = FieldType.Date, name = "createdDate")
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", name="createdDate")
 	private Date createdDate;
 	public String getMobileNo() {
 		return mobileNo;

@@ -1,5 +1,6 @@
 package com.banti.wallet.ums.validator.request;
 
+import com.banti.wallet.ums.requestEntities.AddMoneyTransactionRequest;
 import com.banti.wallet.ums.requestEntities.TransactionRequest;
 
 public class TransactionRequestValidator {
@@ -26,10 +27,14 @@ public class TransactionRequestValidator {
 	
 	
 	//check request parameter for addMoney API
-	public static void  addMoneyRequestValidator(TransactionRequest request) throws Exception {
-		if(request.getAmount()<=0) {
+	public static void  addMoneyRequestValidator(AddMoneyTransactionRequest request) throws Exception {
+		
+		if(request.getAmount()<0){
 			throw new Exception("Invaid Request Parameter, amount is negative or zero "+request.getAmount());
 		}
+		
+		if(request.getMobileNo().length()!=10)
+			throw new Exception("Invaid Request Parameter, amount is negative or zero "+request.getMobileNo());
 		
 	}
 }

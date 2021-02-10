@@ -86,10 +86,10 @@ public class MerchantWalletService implements MoneyMovementService
 		MerchantWallet merchantWallet=(MerchantWallet) wallet;
 		logger.info("received debit request of amount {} from merchant {}",amount,merchantWallet);
 		merchantWallet.setBalance(merchantWallet.getBalance()-amount);
-		//MerchantWallet updatedMerchantWallet = updateMerchantWallet(merchantWallet);
-		//logger.info("merchant balance is {} after deducting amount{}",updatedMerchantWallet.getBalance(),amount);
-		//return updatedMerchantWallet;
-		return merchantWallet;
+		MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(merchantWallet);
+		logger.info("merchant balance is {} after deducting amount{}", updatedMerchantWallet.getBalance(),amount);
+		
+		return  updatedMerchantWallet;
 	}
 
 	@Override
@@ -97,11 +97,9 @@ public class MerchantWalletService implements MoneyMovementService
 		MerchantWallet merchantWallet=(MerchantWallet) wallet;
 		logger.info("received credit request of amount {} from merchant {}",amount,merchantWallet);
 		 merchantWallet.setBalance(merchantWallet.getBalance()+amount);
-		 /* updatedMerchantWallet = updateMerchantWallet(merchantWallet);
-		 * logger.info("merchant balance is {} after crediting amount{}"
-		 * ,updatedMerchantWallet.getBalance(),amount);
-		 */
-		return merchantWallet;
+		 MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(merchantWallet);
+		 logger.info("merchant balance is {} after crediting amount {}"+ updatedMerchantWallet.getBalance());
+		return  updatedMerchantWallet;
 	}	
 
 }

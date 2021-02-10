@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
-import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
 import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
 import com.banti.wallet.ums.service.PersonService;
@@ -25,7 +24,7 @@ public class PersonController
 	private PersonService personService;                                             
 
      //RESTful API for getting all users
-	 @GetMapping("/Persons")
+	 @GetMapping("/persons")
 	 public Iterable<ElasticPerson> fatchAllPerson()
 	 {
 	    return personService.listAllPerson();
@@ -45,6 +44,7 @@ public class PersonController
 	 //RESTful API for Create data
 	 @PostMapping("/Sign-Up")
 	 public ResponseEntity<String> registerPerson(@RequestBody PersonRequestEntity user) {
+		 logger.info("PersonRequestEntity received from user {}",user);
 	     try
 	     {
 	    	 personService.saveUser(user);	 
@@ -76,6 +76,7 @@ public class PersonController
 	 {
 		 try
 		 {
+		  
 		   ElasticPerson user= personService.getPerson(id);  
 		    personService.deletePerson(id);
 		   return new ResponseEntity<ElasticPerson>(user,HttpStatus.OK);      

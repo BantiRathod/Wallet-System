@@ -10,29 +10,31 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
-import com.banti.wallet.ums.service.PersonService;
+import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.repository.PersonRepository;
+
 
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 	
 	Logger logger = LoggerFactory.getLogger(JwtUserDetailsService.class);
+	
 	@Autowired 
-	private PersonService userService;
+	private PersonRepository personRepo;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
 		
-	ElasticPerson user = userService.findUserByUserName(username);
+	Person person = personRepo.findPersonByUserName(username);
 		//String pass = bcryptEncoder.encode(user.getPassword());
 	
-	  logger.info("user received from database {}", user);
+	  logger.info("user received from database {}", person);
 		
-		if (user.getUserName().equals(username)) {
+		if (person.getUserName().equals(username)) {
 		
-			return new  User(user.getUserName(), user.getPassword(),new ArrayList<>());
+			return new  User(person.getUserName(), person.getPassword(),new ArrayList<>());
 		} else {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}

@@ -1,7 +1,6 @@
 package com.banti.wallet.ums.service;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticPersonRepository;
 import com.banti.wallet.ums.enums.PersonStatus;
 import com.banti.wallet.ums.model.Person;
-import com.banti.wallet.ums.elasticsearch.baseInterfaces.BasePerson;
 import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.repository.PersonRepository;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
@@ -21,7 +19,7 @@ import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
 
 @Service
 @Transactional
-public class PersonService extends BasePerson {
+public class PersonService  {
 	
 	@Autowired
 	private ElasticPersonRepository elasPersonRepository;

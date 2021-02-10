@@ -78,8 +78,7 @@ public class PersonWalletService implements MoneyMovementService {
 		
 		 elasticPersonWallet.setMobileNo(wallet.getMobileNo());
 		 elasticPersonWalletRepository.save(elasticPersonWallet);
-		 
-		 
+		  
 		 PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
 		 personWallet.setMobileNo(wallet.getMobileNo());
 		 personWalletRepository.save(personWallet);
@@ -93,20 +92,25 @@ public class PersonWalletService implements MoneyMovementService {
 		
 		logger.info("received debit request of amount {} from user wallet {}",amount,personWallet);
 		personWallet.setBalance(personWallet.getBalance()-amount);
-		personWalletRepository.save(personWallet);
+		
+		PersonWallet updatedWallet=personWalletRepository.save(personWallet);
 		
 		logger.info("merchant balance is {} after deducting amount{}",personWallet.getBalance(),amount);
-		return personWallet;
+		return updatedWallet;
 	}
 
 	@Override
 	public BaseWallet creditMoney(BaseWallet wallet, double amount) {
 		PersonWallet personWallet=(PersonWallet) wallet;
-		logger.info("received credit request of amount {} from user wallet {}",amount,personWallet);
+		
+		logger.info("received credit request of amount {} from user wallet {}", amount , personWallet);
+		
 		personWallet.setBalance(personWallet.getBalance()+amount);
-		personWalletRepository.save(personWallet);
+		
+		PersonWallet updatedWallet=personWalletRepository.save(personWallet);
+		
 		logger.info("person balance is {} after credit amount{}",personWallet.getBalance(),amount);
-		return personWallet;
+		return updatedWallet;
 	}
 
 }

@@ -7,7 +7,7 @@ import com.banti.wallet.ums.requestEntities.PaginationRequest;
 @Service 
 public class PaginationRequestValidator {
    
-	public void summaryValidator(PaginationRequest paginationRequest) throws Exception
+	public void  paginationRequestValidation(PaginationRequest paginationRequest) throws Exception
 	{
 		if(paginationRequest.getPageNo()<0)
 			throw new Exception(" pageNo is not valid, pageNo is = " + paginationRequest.getPageNo());

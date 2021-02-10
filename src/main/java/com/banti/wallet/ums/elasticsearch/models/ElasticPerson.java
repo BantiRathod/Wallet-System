@@ -7,10 +7,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import com.banti.wallet.ums.elasticsearch.baseInterfaces.BasePerson;
 
-@Document(indexName="ElasticPerson")
-public class ElasticPerson extends BasePerson{
+@Document(indexName="ElasticPerson", shards=1)
+public class ElasticPerson {
 	
 		@Id
 		private Long userId;

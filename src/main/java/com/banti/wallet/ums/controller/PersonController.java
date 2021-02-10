@@ -8,45 +8,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
+import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
 import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
 import com.banti.wallet.ums.service.PersonService;
+import com.banti.wallet.ums.validator.request.PersonRequestBodyValidator;
+
 import java.util.NoSuchElementException;
 
 
-
-@RestController                                                                    //work at server side and remove view part
+//TO WORK AT SERVER SIDE AND REMOVE VIEW PART Restcontroller USED 
+@RestController                                                                   
 public class PersonController 
 {
 	Logger logger=LoggerFactory.getLogger(PersonController.class);
 	
+	@Autowired
+	private PersonRequestBodyValidator personRequestBodyValidator;
+	//TO INJECT(PUSH HERE) PERSONSERVICE CLASS OBJECT( FROM APPLICATION CONTEXT{IOC CONTAINER})
 	@Autowired                                                                     
 	private PersonService personService;                                             
 
-     //RESTful API for getting all users
+   
 	 @GetMapping("/persons")
 	 public Iterable<ElasticPerson> fatchAllPerson()
 	 {
 	    return personService.listAllPerson();
 	 }
 	 
-	//RESTful API for getting the record particular user
+	
 	 @GetMapping("/person/{id}")
 	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {
 	     try {
+	    	  personRequestBodyValidator.personRequestIdValidation(id);
 	    	 ElasticPerson person = personService.getPerson(id);
 	         return new ResponseEntity<ElasticPerson> (person, HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
+	    	 logger.error("Exception occured, "+e.getMessage());
 	         return new ResponseEntity<ElasticPerson>(HttpStatus.NOT_FOUND);
-	     }      
+	     } catch(Exception e)
+	     {
+	    	 logger.error("Exception occured, "+e.getMessage());
+	    	 return new ResponseEntity<ElasticPerson>(HttpStatus.NOT_FOUND);
+	     }
 	 }
 	
-	 //RESTful API for Create data
+	 
 	 @PostMapping("/Sign-Up")
 	 public ResponseEntity<String> registerPerson(@RequestBody PersonRequestEntity user) {
 		 logger.info("PersonRequestEntity received from user {}",user);
 	     try
 	     {
+	    	 
 	    	 personService.saveUser(user);	 
 	         return new ResponseEntity<String>("person registered successfully And userName= "+user.getUserName()+", password= "+user.getPassword(),HttpStatus.OK);
 	     }
@@ -59,31 +72,37 @@ public class PersonController
 	 
 	// RESTful API for Update Operation
 	 @PutMapping("/person/{id}")
-	 public ResponseEntity<String> update(@RequestBody UpdatePersonRequest person,@PathVariable Long id) {
+	 public ResponseEntity<String> toUpdatePersonDetail(@RequestBody UpdatePersonRequest person,@PathVariable Long id) {
 	     try
-	     {
+	     {   
+	    	 //TO CHECK PASSED PARAMETERS ARE VALID OR NOT
+	    	 personRequestBodyValidator.personRequestBodyAndIdValidation(person,id);
+	    	 
 	    	 logger.info("person received as a request body {}",person);
+	    	 
 	    	 personService.updatePerson(person,id);
 	         return new ResponseEntity<String>(" Record of the given id's person has been updated ",HttpStatus.OK);
-	     } catch (NoSuchElementException e) {
+	     } catch (Exception e) {
 	         return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 	     }      
 	 } 
 	
 	// RESTful API for Delete Operation
 	 @DeleteMapping("/person/{id}")
-	 public ResponseEntity<ElasticPerson> deletePersonUsingId(@PathVariable Long id)
+	 public ResponseEntity<Person> deletePersonUsingId(@PathVariable Long id)
 	 {
 		 try
 		 {
-		  
-		   ElasticPerson user= personService.getPerson(id);  
+			personRequestBodyValidator.personRequestIdValidation(id);
+		    Person person= personService.getPersonMysql(id);  
 		    personService.deletePerson(id);
-		   return new ResponseEntity<ElasticPerson>(user,HttpStatus.OK);      
+		    logger.info("deleted person {}, " + person);
+		   return new ResponseEntity<Person>(person,HttpStatus.OK);      
 	     }
-		  catch(NoSuchElementException e)
+		  catch(Exception e)
 		  {
-			 return new ResponseEntity<ElasticPerson>(HttpStatus.NOT_FOUND);
+			 logger.error("Exception occured, "+e.getMessage());
+			 return new ResponseEntity<Person>(HttpStatus.NOT_FOUND);
 		  }
 	 }
 }

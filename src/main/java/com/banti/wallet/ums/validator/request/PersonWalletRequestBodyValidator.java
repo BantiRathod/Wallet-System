@@ -6,10 +6,10 @@ import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
 import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 
 @Service
-public class PersonWalletRequestValidator 
+public class PersonWalletRequestBodyValidator 
 {
 
-	public void  personWalletRequestBodyValidation(PersonWalletRequest personWalletRequest ) throws Exception
+	public void  createPersonWalletValidation(PersonWalletRequest personWalletRequest ) throws Exception
 	{
 		if( personWalletRequest.getBalance() < 0)
 			 throw new Exception("invalid amount, "+personWalletRequest.getBalance()) ;

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ import com.banti.wallet.ums.elasticsearch.models.ElasticPersonWallet;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
 import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 import com.banti.wallet.ums.service.PersonWalletService;
-import com.banti.wallet.ums.validator.request.PersonWalletRequestValidator;
+import com.banti.wallet.ums.validator.request.PersonWalletRequestBodyValidator;
 
 @RestController
 public class PersonWalletController {
@@ -29,7 +30,7 @@ public class PersonWalletController {
 	private PersonWalletService personWalletService;
 	
 	@Autowired
-	PersonWalletRequestValidator personWalletRequestValidator;
+	PersonWalletRequestBodyValidator personWalletRequestBodyValidator;
 	
 	@GetMapping("/personWallets")
 	public ResponseEntity<Iterable<ElasticPersonWallet>> listOfAllPersonWallet()
@@ -45,35 +46,35 @@ public class PersonWalletController {
 		}	
 	}
 	
+	
 	@GetMapping("/personWallet/{mobileNo}")
 	 public ResponseEntity<ElasticPersonWallet> fatchWallet(@PathVariable String mobileNo)
 	 {
 		logger.info("mobileNo received from user {}", mobileNo);
 		try
 		{
-			personWalletRequestValidator.personWalletMobileNoValidation(null , mobileNo);
+			 personWalletRequestBodyValidator.personWalletMobileNoValidation(null , mobileNo);
 	         ElasticPersonWallet existWallet = personWalletService.getPersonWallet(mobileNo);
+	         logger.info("reponsed person Wallet {}", existWallet);
 	         return new ResponseEntity<ElasticPersonWallet>(existWallet,HttpStatus.OK);
 		}
-		catch(Exception e)
-		{
+		catch(Exception e){
 			return new ResponseEntity<ElasticPersonWallet>(HttpStatus.NOT_FOUND);
 		}	
 	 }
 	 
 	
 	@PostMapping("/personWallet")
-	public String createWallet(@RequestBody PersonWalletRequest wallet)
+	public ResponseEntity<String> createWallet(@RequestBody PersonWalletRequest wallet)
       {
 		logger.info("PersonWalletRequest received from user {}", wallet);
 		  try
 		 {
-		   personWalletRequestValidator.personWalletRequestBodyValidation(wallet);
+		   personWalletRequestBodyValidator.createPersonWalletValidation(wallet);
 		   personWalletService.createPersonWallet(wallet);	
-		   return "new person wallet has heen created with  "+ wallet.getMobileNo()+" mobileNo";
-      }catch(Exception e)
-		{
-    	  return e.getMessage();
+		   return new ResponseEntity<String>("New person wallet has heen created with "+ wallet.getMobileNo() +" mobileNo",HttpStatus.OK);
+      }catch(Exception e){
+    	  return new ResponseEntity<String>("Exception occured, "+e.getMessage(),HttpStatus.OK);
 		}
      }	
 	
@@ -84,7 +85,7 @@ public class PersonWalletController {
 		try
 		{
 		  // TO VALIDATE NEW passed MOBILENO
-		  personWalletRequestValidator.personWalletMobileNoValidation(personWallet,mobileNo);
+		  personWalletRequestBodyValidator.personWalletMobileNoValidation(personWallet,mobileNo);
 		  personWalletService.updatePersonWallet(personWallet, mobileNo);
 		  return new ResponseEntity<String>(" person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);
 	 }catch(Exception e)
@@ -92,4 +93,22 @@ public class PersonWalletController {
 		  return new ResponseEntity<>("Exception occured, "+e.getMessage(),HttpStatus.OK);
 		}
 	}
+	
+	
+	@DeleteMapping("/personWallet/{mobileNo}")
+	public ResponseEntity<String> deletePersonWallet(@PathVariable String mobileNo)
+	{
+		try
+		{
+		  // TO VALIDATE NEW passed MOBILENO
+		  personWalletRequestBodyValidator.personWalletMobileNoValidation(null,mobileNo);
+		  
+		  personWalletService.deletePersonWallet(mobileNo);
+		  return new ResponseEntity<String>(" person wallet deletd successfully, of this mobile no: "+ mobileNo,HttpStatus.OK);
+	 }catch(Exception e)
+		{
+		  return new ResponseEntity<>("Exception occured, "+e.getMessage(),HttpStatus.OK);
+		}
+	}
+	
 }

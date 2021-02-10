@@ -15,36 +15,48 @@ import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.repository.MerchantWalletRepository;
 import com.banti.wallet.ums.requestEntities.MerchantWalletRequest;
 import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
+import com.banti.wallet.ums.validator.business.MerchantWalletBusinessValidator;
 
 @Service (value="merchantWalletService")
 @Transactional
 public class MerchantWalletService implements MoneyMovementService
 {
 	Logger logger=LoggerFactory.getLogger(MerchantWalletService.class);
+	
 	 @Autowired
 	 private ElasticMerchantWalletRepository  elasticMerchantWalletRepository;
+	 
 	 @Autowired
 	 private MerchantWalletRepository merchantWalletRepository;
-	
+	 
+	 @Autowired
+	 private MerchantWalletBusinessValidator merchantWalletBusinessValidator;
+	 
+	 
 	 public Iterable<ElasticMerchantWallet> getListOfAllMerchantWallet()
 	 {
 		 return  elasticMerchantWalletRepository.findAll();
 	 }
 	 
+	 
 	 public  ElasticMerchantWallet getMerchantWallet(String mobileNo)
 	 {
-	  return   elasticMerchantWalletRepository.findById(mobileNo).get();
+		 
+	    return   elasticMerchantWalletRepository.findById(mobileNo).get();
 	 }
+	
+	 
+	public void deleteMerchantWallet(String mobileNo) {
+			 merchantWalletRepository.deleteById(mobileNo);
+			 elasticMerchantWalletRepository.deleteById(mobileNo);
+	 }	
+	
 	
 	 public void createMerchantWallet(MerchantWalletRequest  merchantWallet) throws Exception
 	 {
-		 //TO CHECK WHETHER ACCOUNT IS ALREADY EXIST OR NOT
-		 ElasticMerchantWallet tempMerchantWallet = elasticMerchantWalletRepository.findById(merchantWallet.getMobileNo()).get();
-		 if(tempMerchantWallet!=null)
-			 throw new Exception("merchant account is already oppened with this mobile number "+ merchantWallet.getMobileNo());
-			 
-		 if(merchantWallet.getMobileNo().length()!=10)
-			  throw new Exception("Invalid mobile No entered "+ merchantWallet.getMobileNo());
+		 //TO BUSINESS VALIDATION FOR CREATE Merchant Wallet 
+		 merchantWalletBusinessValidator.createMerchantWalletValidation(merchantWallet);
+		 
 		 MerchantWallet  tempmerchantWallet = new  MerchantWallet();
 		 
 		 tempmerchantWallet.setBalance(merchantWallet.getBalance());
@@ -64,18 +76,15 @@ public class MerchantWalletService implements MoneyMovementService
 
 	public void updateMerchantWallet(UpdateMerchantWalletRequest merchantWallet, String mobileNo) throws Exception 
 	{
-		ElasticMerchantWallet elasticMerchantWallet = elasticMerchantWalletRepository.findById(mobileNo).get();
-		 if(elasticMerchantWallet==null)
-		    	 throw new Exception("account not opened yet by this mobile number");
-		 
-		 if(mobileNo.length()!=10)
-			 throw new Exception("Invalid number passed, mobile no="+mobileNo);
-		 
+		//FOR BUSINESS VALIADATION
+		 merchantWalletBusinessValidator.updateMerchantWalletValidation(merchantWallet,mobileNo);
+		
+		 ElasticMerchantWallet elasticMerchantWallet = elasticMerchantWalletRepository.findById(mobileNo).get();
 		 elasticMerchantWallet.setMobileNo(mobileNo);
 		 elasticMerchantWalletRepository.save( elasticMerchantWallet);
 		 
 		 MerchantWallet tempMerchantWallet = merchantWalletRepository.findById(mobileNo).get();
-		 tempMerchantWallet.setMobileNo(mobileNo);
+		 tempMerchantWallet.setMobileNo(merchantWallet.getMobileNo());
 		 merchantWalletRepository.save(tempMerchantWallet);
 		
 	}
@@ -100,6 +109,7 @@ public class MerchantWalletService implements MoneyMovementService
 		 MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(merchantWallet);
 		 logger.info("merchant balance is {} after crediting amount {}"+ updatedMerchantWallet.getBalance());
 		return  updatedMerchantWallet;
-	}	
+	}
+
 
 }

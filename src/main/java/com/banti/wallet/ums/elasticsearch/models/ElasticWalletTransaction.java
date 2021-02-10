@@ -3,6 +3,7 @@ package com.banti.wallet.ums.elasticsearch.models;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -26,7 +27,7 @@ public class ElasticWalletTransaction {
 	private String status;
 	@Field(type=FieldType.Text, name="transactionType")
 	private String transactionType;
-	@Field(type=FieldType.Date, name=" transactionDate")
+	 @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", name="transactionDate")
 	private Date transactionDate;
 	@Field(type=FieldType.Text, name="orderId")
 	private String orderId;

@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 
-@Document(indexName="ElasticPerson", shards=1)
+@Document(indexName="elastic_person", shards=1)
 public class ElasticPerson {
 	
 		@Id

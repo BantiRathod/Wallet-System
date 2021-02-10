@@ -10,9 +10,6 @@ import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfig
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages 
-        = "com.banti.wallet.ums.elasticsearch.repositories")
-@ComponentScan(basePackages = { "com.banti.wallet.ums.elasticsearch" })
 public class ElasticsearchClientConfig extends 
          AbstractElasticsearchConfiguration {
   @Override

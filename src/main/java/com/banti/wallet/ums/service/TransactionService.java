@@ -64,8 +64,8 @@ public class TransactionService
 			throw new Exception("user does not exist with this mobile Number");
 		}
 		
-		List<ElasticWalletTransaction> userTransactionListpayerTime = (List<ElasticWalletTransaction>) elasticWalletTransactionRepository.findAllByPayerNo(person.getMobileNo());
-		List<ElasticWalletTransaction> userTransactionListpayeeTime =  (List<ElasticWalletTransaction>) elasticWalletTransactionRepository.findAllByPayeeNo(person.getMobileNo());
+		List<ElasticWalletTransaction> userTransactionListpayerTime = (List<ElasticWalletTransaction>) elasticWalletTransactionRepository.findAllByPayerMobileNo(person.getMobileNo());
+		List<ElasticWalletTransaction> userTransactionListpayeeTime =  (List<ElasticWalletTransaction>) elasticWalletTransactionRepository.findAllByPayeeMobileNo(person.getMobileNo());
 		List<ElasticWalletTransaction> list =  new ArrayList<>();
                   list.addAll(userTransactionListpayeeTime);
                   list.addAll(userTransactionListpayerTime);

@@ -14,6 +14,4 @@ public interface PersonRepository extends JpaRepository<Person,Long>
 
     @Query("select p from Person p where p.userName = :userName ")
 	Person findPersonByUserName(@Param("userName")String userName);
-
-
 }

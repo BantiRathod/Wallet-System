@@ -34,6 +34,12 @@ public class MerchantService
 		 return  elasticMerchantRepository.findAll();
 	 }
 	 
+
+	public Merchant findByMobileNoFromMysql(String payeeMobileNo) {
+		return  merchantRepository.findByMobileNo(payeeMobileNo) ;
+	}
+	
+	
 	 public ElasticMerchant getMerchant(Long id) throws Exception
 	 {
 	      return elasticMerchantRepository.findById(id).get();
@@ -113,6 +119,6 @@ public class MerchantService
 		 
 		 merchantRepository.save(tempmarchant); 
 	 }
-	
+
    
 }

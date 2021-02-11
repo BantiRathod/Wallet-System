@@ -52,8 +52,10 @@ public class PersonWalletController {
 	 {
 		logger.info("mobileNo received from user {}", mobileNo);
 		try
-		{
+		{   
+			//FOR MOBILE NUMBER VALIDATION
 			 personWalletRequestBodyValidator.personWalletMobileNoValidation(null , mobileNo);
+			 
 	         ElasticPersonWallet existWallet = personWalletService.getPersonWallet(mobileNo);
 	         logger.info("reponsed person Wallet {}", existWallet);
 	         return new ResponseEntity<ElasticPersonWallet>(existWallet,HttpStatus.OK);
@@ -70,7 +72,9 @@ public class PersonWalletController {
 		logger.info("PersonWalletRequest received from user {}", wallet);
 		  try
 		 {
+		   //FOR REQUEST BODY VALIDATION
 		   personWalletRequestBodyValidator.createPersonWalletValidation(wallet);
+		   
 		   personWalletService.createPersonWallet(wallet);	
 		   return new ResponseEntity<String>("New person wallet has heen created with "+ wallet.getMobileNo() +" mobileNo",HttpStatus.OK);
       }catch(Exception e){
@@ -105,8 +109,7 @@ public class PersonWalletController {
 		  
 		  personWalletService.deletePersonWallet(mobileNo);
 		  return new ResponseEntity<String>(" person wallet deletd successfully, of this mobile no: "+ mobileNo,HttpStatus.OK);
-	 }catch(Exception e)
-		{
+	 }catch(Exception e){
 		  return new ResponseEntity<>("Exception occured, "+e.getMessage(),HttpStatus.OK);
 		}
 	}

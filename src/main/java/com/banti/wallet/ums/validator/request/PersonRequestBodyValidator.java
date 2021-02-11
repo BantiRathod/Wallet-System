@@ -23,4 +23,11 @@ public class PersonRequestBodyValidator {
 			throw new Exception("Invalid MobileNo found , "+ person.getMobileNo());
 		
 	}
+
+	public void createPersonValidation(PersonRequestEntity person) throws Exception{
+		
+		if(person.getMobileNo().length()!=10)
+			throw new Exception("Invalid MobileNo found , "+ person.getMobileNo());
+		
+	}
 }

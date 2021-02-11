@@ -13,19 +13,19 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.banti.wallet.ums.constant.ContextConstant;
-import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.elasticsearch.models.ElasticPersonWallet;
 import com.banti.wallet.ums.elasticsearch.models.ElasticWalletTransaction;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticPersonWalletRepository;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticWalletTransactionRepository;
 import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.MerchantWallet;
+import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.repository.PersonWalletRepository;
 import com.banti.wallet.ums.repository.TransactionRepository;
 import com.banti.wallet.ums.requestEntities.AddMoneyTransactionRequest;
-import com.banti.wallet.ums.requestEntities.PaginationRequest;
+//import com.banti.wallet.ums.requestEntities.PaginationRequest;
 import com.banti.wallet.ums.requestEntities.TransactionRequest;
 import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
 
@@ -57,13 +57,12 @@ public class TransactionService
 	@Qualifier(value="merchantWalletService")
 	private  MoneyMovementService merchantMoneyMovementService;
 	
-	public Iterable<ElasticWalletTransaction> getListOfAllTransaction(PaginationRequest paginationRequest) throws Exception
+	public Iterable<ElasticWalletTransaction> getListOfAllTransaction(Long userId) throws Exception
 	{
-		ElasticPerson person = personService.getPerson(paginationRequest.getUserId());
-		if(person==null) {
-			throw new Exception("user does not exist with this mobile Number");
-		}
+		//TO CHECK THAT USER IS AVAILABLE OR NOT
+		 transactionBusinessValidator.summaryBusinessValidation(userId);
 		
+		Person person = personService.getPersonMysql(userId);
 		List<ElasticWalletTransaction> userTransactionListpayerTime = (List<ElasticWalletTransaction>) elasticWalletTransactionRepository.findAllByPayerMobileNo(person.getMobileNo());
 		List<ElasticWalletTransaction> userTransactionListpayeeTime =  (List<ElasticWalletTransaction>) elasticWalletTransactionRepository.findAllByPayeeMobileNo(person.getMobileNo());
 		List<ElasticWalletTransaction> list =  new ArrayList<>();
@@ -71,7 +70,7 @@ public class TransactionService
                   list.addAll(userTransactionListpayerTime);
         return (Iterable<ElasticWalletTransaction>)list;
 	
-	/* BEFORE THE ELASTICSEARCH DATABASE
+	/*                  // BEFORE THE ELASTICSEARCH DATABASE
 	 * Pageable pageable = PageRequest.of(paginationRequest.getPageNo(),
 	 * paginationRequest.getPageSize(), Sort.Direction.ASC, "id"); return
 	 * transactionrepository.findAllByPayerNo(person.getMobileNo(),pageable); }

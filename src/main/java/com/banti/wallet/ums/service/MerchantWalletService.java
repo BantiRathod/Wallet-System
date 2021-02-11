@@ -112,4 +112,10 @@ public class MerchantWalletService implements MoneyMovementService
 	}
 
 
+	public MerchantWallet getMerchantWalletFromMysql(String payeeMobileNo) {
+		
+		return  merchantWalletRepository.findById(payeeMobileNo).get();
+	}
+
+
 }

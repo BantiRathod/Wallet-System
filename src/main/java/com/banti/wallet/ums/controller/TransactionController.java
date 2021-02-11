@@ -19,19 +19,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banti.wallet.ums.constant.ContextConstant;
-import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.elasticsearch.models.ElasticWalletTransaction;
 import com.banti.wallet.ums.enums.TxnType;
 import com.banti.wallet.ums.model.Merchant;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.requestEntities.AddMoneyTransactionRequest;
-import com.banti.wallet.ums.requestEntities.PaginationRequest;
 import com.banti.wallet.ums.requestEntities.TransactionRequest;
 import com.banti.wallet.ums.responseEntities.TransactionResponse;
 import com.banti.wallet.ums.service.PersonService;
 import com.banti.wallet.ums.service.TransactionService;
-import com.banti.wallet.ums.validator.request.PaginationRequestValidator;
+//import com.banti.wallet.ums.validator.request.PaginationRequestValidator;
 import com.banti.wallet.ums.validator.request.TransactionRequestValidator;
 
 @RestController
@@ -41,27 +39,30 @@ public class TransactionController {
 	@Autowired
 	private TransactionService transactionService;
 
-	@Autowired
-	private PaginationRequestValidator paginationRequestValidator;
-
+	/*
+	 * @Autowired private PaginationRequestValidator paginationRequestValidator;
+	 */
 	@Autowired 
 	private PersonService personService;
 	 
 
-	@GetMapping("/transactionSummary")
-	public ResponseEntity<Iterable<ElasticWalletTransaction>> getTransactionSummary(@RequestBody PaginationRequest paginationRequest) {
-		logger.info("paginationRequest received {}", paginationRequest);
+	@GetMapping("/transactionSummary/{userId}")
+	public ResponseEntity<Iterable<ElasticWalletTransaction>> getTransactionSummary(@PathVariable Long userId ) {
+		logger.info("paginationRequest received {}", userId);
 		
 		try {
-			paginationRequestValidator.paginationRequestValidation(paginationRequest);
+			//TO VALIDATE REQUST BODY OF TRANSACTION SUMMARY
+			//paginationRequestValidator.paginationRequestValidation(paginationRequest);
 
-			Iterable<ElasticWalletTransaction> page = transactionService.getListOfAllTransaction(paginationRequest);
+			Iterable<ElasticWalletTransaction> page = transactionService.getListOfAllTransaction(userId);
 			
 			logger.info("paginationResponse respond {}", page);
 			return new ResponseEntity<Iterable<ElasticWalletTransaction>>(page, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
+			logger.error("exception occured "+e.getMessage());
 			return new ResponseEntity<Iterable<ElasticWalletTransaction>>(HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
+			logger.error("exception occured "+e.getMessage());
 			return new ResponseEntity<Iterable<ElasticWalletTransaction>>(HttpStatus.NOT_FOUND);
 		}
 	}
@@ -72,22 +73,27 @@ public class TransactionController {
 			String status = transactionService.getStatus(id);
 			return new ResponseEntity<String>(status, HttpStatus.OK);
 		} catch (NoSuchElementException e) {
-			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<String>("Exception occured, "+e.getMessage(),HttpStatus.NOT_FOUND);
 		}
 	}
 
 	// API FOR SENDING MONEY TO A MERCHANT
 	@PostMapping("/transaction/P2M")
 	public ResponseEntity<TransactionResponse> payMoneyToMerchant(@RequestBody TransactionRequest request) {
+		
 		logger.info("p2m transaction received {}", request);
 
 		TransactionResponse transactionResponse = new TransactionResponse();
 		Map<String, Object> p2mContext = new HashMap<>();
 
 		try {
+			//TO VALIDATE REQUEST BODY OF P2M TRANSACTION
 			TransactionRequestValidator.p2mRequestValidator(request);
+			
 			WalletTransaction tempTransaction = transactionService.performP2M(request, p2mContext);
+			
 			logger.info("after performing transaction p2mContext {}",p2mContext);
+			
 			generateP2MResponse(request, transactionResponse, p2mContext, tempTransaction);
 
 		} catch (Exception e) {
@@ -118,14 +124,17 @@ public class TransactionController {
 	// API FOR SENDING MONEY TO A PERSON
 	@PostMapping("/transaction/P2P")
 	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest request) {
+		
 		logger.info("p2p transaction received {}", request);
 
 		TransactionResponse transactionResponse = new TransactionResponse();
 		Map<String, Object> p2pContext = new HashMap<>();
 		try {
-
+			//TO VALIDATE REQUEST BODY OF P2P TRANSACTION
 			TransactionRequestValidator.p2pRequestValidator(request);
+			
 			logger.info("after performing transaction p2pContext {}",p2pContext);
+			
 			WalletTransaction tempTransaction = transactionService.performp2p(request, p2pContext);
 			
 			generateP2PResponse(request, transactionResponse, tempTransaction, p2pContext);
@@ -165,6 +174,7 @@ public class TransactionController {
 	   logger.info("addMoney transaction received request Body {}", request);
 	   TransactionResponse transactionResponse = new TransactionResponse();
 	  try {
+		   //TO VALIDATE REQUEST BODY OF ADDMONET TRANSACTION
 		   TransactionRequestValidator.addMoneyRequestValidator(request);
 	 
 	       WalletTransaction transaction=transactionService.performAddMoney(request);
@@ -186,7 +196,7 @@ public class TransactionController {
 	  
 	  private void generateAddMoneyResponse(AddMoneyTransactionRequest request,TransactionResponse transactionResponse, WalletTransaction Transaction) { 
 	 
-	  ElasticPerson person = personService.findByMobileNo(request.getMobileNo());
+	  Person person = personService.findPersonByMobileNoMysql(request.getMobileNo());
 	  
 	  transactionResponse.setPayerName("External source");
 	  transactionResponse.setPayeeName(person.getFirstName());

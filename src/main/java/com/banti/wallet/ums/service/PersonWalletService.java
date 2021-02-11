@@ -17,11 +17,15 @@ import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.repository.PersonWalletRepository;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
 import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
+import com.banti.wallet.ums.validator.business.PersonWalletBusinessValidator;
 
 @Service(value="personWalletService")
 @Transactional
 public class PersonWalletService implements MoneyMovementService { 
 	Logger logger=LoggerFactory.getLogger(PersonWalletService.class);
+	
+	@Autowired
+	private PersonWalletBusinessValidator personWalletBusinessValidator;
 	
 	@Autowired
 	private ElasticPersonWalletRepository elasticPersonWalletRepository;
@@ -35,7 +39,11 @@ public class PersonWalletService implements MoneyMovementService {
 		 return elasticPersonWalletRepository.findAll();
 	 }
 	 
-	 
+
+		public PersonWallet getPersonWalletFromMysql(String mobileNo) {
+			return 	personWalletRepository.findById(mobileNo).get();
+			
+		}
 	 public ElasticPersonWallet getPersonWallet(String mobileNo)
 	 {
 	  return  elasticPersonWalletRepository.findById(mobileNo).get();
@@ -71,17 +79,15 @@ public class PersonWalletService implements MoneyMovementService {
 	
 	public void updatePersonWallet(UpdatePersonWalletRequest wallet, String mobileNo) throws Exception
 	{
-		 ElasticPersonWallet elasticPersonWallet  = elasticPersonWalletRepository.findById(mobileNo).get();
-		 if(elasticPersonWallet==null)
-			 throw new Exception("NO PERSON WALLET EXIST OF THIS NUMBER ");
-		 
+		personWalletBusinessValidator.updatePersonWalletValidatoion(wallet,mobileNo);
 		
-		 elasticPersonWallet.setMobileNo(wallet.getMobileNo());
-		 elasticPersonWalletRepository.save(elasticPersonWallet);
-		  
 		 PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
 		 personWallet.setMobileNo(wallet.getMobileNo());
 		 personWalletRepository.save(personWallet);
+		
+		 ElasticPersonWallet elasticPersonWallet = elasticPersonWalletRepository.findById(mobileNo).get();
+		 elasticPersonWallet.setMobileNo(wallet.getMobileNo());
+		 elasticPersonWalletRepository.save(elasticPersonWallet);
 	
 	}
 	
@@ -112,5 +118,7 @@ public class PersonWalletService implements MoneyMovementService {
 		logger.info("person balance is {} after credit amount{}",personWallet.getBalance(),amount);
 		return updatedWallet;
 	}
+
+
 
 }

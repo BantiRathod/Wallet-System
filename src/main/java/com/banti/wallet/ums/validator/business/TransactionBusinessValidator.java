@@ -4,13 +4,13 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.banti.wallet.ums.constant.ContextConstant;
-import com.banti.wallet.ums.elasticsearch.models.ElasticMerchant;
-import com.banti.wallet.ums.elasticsearch.models.ElasticMerchantWallet;
-import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
-import com.banti.wallet.ums.elasticsearch.models.ElasticPersonWallet;
+
 import com.banti.wallet.ums.enums.AccountStatus;
 import com.banti.wallet.ums.enums.PersonStatus;
-
+import com.banti.wallet.ums.model.Merchant;
+import com.banti.wallet.ums.model.MerchantWallet;
+import com.banti.wallet.ums.model.Person;
+import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.requestEntities.AddMoneyTransactionRequest;
 import com.banti.wallet.ums.requestEntities.TransactionRequest;
 import com.banti.wallet.ums.service.MerchantService;
@@ -39,7 +39,7 @@ public class TransactionBusinessValidator {
 	public void p2mValidation(TransactionRequest request, Map<String, Object> p2mContext) throws Exception {
 		
 		// CHECK USER EXIST OR NOT
-		ElasticPerson person = personService.findByMobileNo(request.getPayerMobileNo());
+		Person person = personService.findPersonByMobileNoMysql(request.getPayerMobileNo());
 		
 		if(person==null) {
 			throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());	
@@ -50,7 +50,7 @@ public class TransactionBusinessValidator {
 		p2mContext.put(ContextConstant.PAYER_PERSON_ACCOUNT, person);
 		
 		// CHECK MERCHANT EXIST OR NOT
-		ElasticMerchant merchant = merchantService.findByMobileNo(request.getPayeeMobileNo());
+		Merchant merchant = merchantService.findByMobileNoFromMysql(request.getPayeeMobileNo());
 		
 		if(merchant==null)  {
 			 throw new Exception("merchant account not exist in system with mobile number "+request.getPayeeMobileNo());
@@ -60,8 +60,8 @@ public class TransactionBusinessValidator {
 		p2mContext.put(ContextConstant.MERCHANT_ACCOUNT, merchant);
 		
 		//CHECK WALLET OF MERCAHNT AND USER 
-		ElasticMerchantWallet payeeMerchantWallet = merchantWalletService.getMerchantWallet(request.getPayeeMobileNo());
-		ElasticPersonWallet payerPersonWallet = personWalletService.getPersonWallet(request.getPayerMobileNo());
+		MerchantWallet payeeMerchantWallet = merchantWalletService.getMerchantWalletFromMysql(request.getPayeeMobileNo());
+		PersonWallet payerPersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayerMobileNo());
 		
 		if (AccountStatus.DISABLED.name().equalsIgnoreCase(payeeMerchantWallet.getStatus())) {
 			     throw new Exception("merchant wallet is not active");
@@ -71,7 +71,7 @@ public class TransactionBusinessValidator {
 		p2mContext.put(ContextConstant.MERCHANT_WALLET, payeeMerchantWallet);
 		
 		//CHECK USER HAS SUFFICIENT AMOUNT
-		 payerPersonWallet = personWalletService.getPersonWallet(request.getPayerMobileNo());
+		payerPersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayerMobileNo());
 		if(payerPersonWallet.getBalance()<request.getAmount()) {
 			throw new Exception(String.format("user does not have sufficient balance, current balance: %f, request txnAmt: %f",payerPersonWallet.getBalance(),request.getAmount()));
 		}		
@@ -82,28 +82,28 @@ public class TransactionBusinessValidator {
 	//FOR P2P VALIDATION
 	public void p2pValidation(TransactionRequest request, Map<String, Object> p2pContext ) throws Exception {
 		//CHECK PAYER USER EXIST 
-		ElasticPerson payerPerson = personService.findByMobileNo(request.getPayerMobileNo());
+		Person payerPerson = personService.findPersonByMobileNoMysql(request.getPayerMobileNo());
 		
 		if(payerPerson==null) 
-			throw new Exception("person account not exist in system with mobile number "+request.getPayerMobileNo());	
+			throw new Exception("payer person account not exist in system with mobile number "+request.getPayerMobileNo());	
 		else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payerPerson.getStatus()))
 			throw new Exception("person account is not active");
 		
 		p2pContext.put(ContextConstant.PAYER_PERSON_ACCOUNT,payerPerson);
 		
 		// CHECK payeeUser EXIST OR NOT
-		ElasticPerson payeePerson = personService.findByMobileNo(request.getPayeeMobileNo());
+		Person payeePerson = personService.findPersonByMobileNoMysql(request.getPayerMobileNo());
 		
 		if(payeePerson==null)  
-			 throw new Exception("user account not exist in system with mobile number "+request.getPayerMobileNo());
+			 throw new Exception("payee user account not exist in system with mobile number "+request.getPayerMobileNo());
 		else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payeePerson.getStatus()))
 			 throw new Exception("user account is not active");
 		
 		p2pContext.put(ContextConstant.PAYEE_PERSON_ACCOUNT, payeePerson);
 		
 		//check user and merchant wallet is active or not
-		ElasticPersonWallet payeePersonWallet = personWalletService.getPersonWallet(request.getPayeeMobileNo());
-		ElasticPersonWallet payerPersonWallet = personWalletService.getPersonWallet(request.getPayerMobileNo());
+		PersonWallet payeePersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayeeMobileNo());
+		PersonWallet payerPersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayerMobileNo());
 		
 		if (AccountStatus.DISABLED.name().equalsIgnoreCase(payeePersonWallet.getStatus())) 
 			     throw new Exception("payee User wallet is not active");
@@ -121,12 +121,21 @@ public class TransactionBusinessValidator {
     //ADD MONEY BUSINESS VALIDATION
 	public void addMoneyBusinessValidatoion(AddMoneyTransactionRequest request) throws Exception {
 		
-		ElasticPersonWallet personWallet = personWalletService.getPersonWallet(request.getMobileNo());
+		PersonWallet personWallet = personWalletService.getPersonWalletFromMysql(request.getMobileNo());
 		
 		if(personWallet==null)
 			throw new Exception("wallet does not exist of this "+request.getMobileNo()+" mobile Number");
 		else if(AccountStatus.DISABLED.name().equalsIgnoreCase(personWallet.getStatus()))
 			throw new Exception("person wallet is not enable of "+request.getMobileNo()+" mobile Number");
+		
+	}
+
+
+	public void summaryBusinessValidation(Long userId) throws Exception{
+		Person person = personService.getPersonMysql(userId);
+		if(person==null) {
+			throw new Exception("user does not exist with this mobile Number");
+		}
 		
 	}		
 	

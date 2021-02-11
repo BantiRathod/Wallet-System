@@ -15,6 +15,7 @@ import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.repository.PersonRepository;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
 import com.banti.wallet.ums.requestEntities.UpdatePersonRequest;
+import com.banti.wallet.ums.validator.business.personBusinessValidator;
 
 
 @Service
@@ -23,7 +24,8 @@ public class PersonService  {
 	
 	@Autowired
 	private ElasticPersonRepository elasPersonRepository;
-	
+	@Autowired
+	private personBusinessValidator personBusinessValidator;
 	@Autowired
 	private PasswordEncoder bcryptEncoder;
 	
@@ -53,17 +55,30 @@ public class PersonService  {
     	return elasPersonRepository.findUserByUserName(username);
     }
 
+    public Person findPersonByMobileNoMysql(String moileNo)
+    {
+    	return personRepository.findByMobileNo(moileNo);
+    }
+    
 	public Person getPersonMysql(Long id) {
 		return personRepository.findById(id).get();
 	}
     //TO UPDATE PERSON RECORD
     public void updatePerson(UpdatePersonRequest person, Long id) throws Exception
     {
+    	//TO BUSINESS VALIADTE FOR UPDTE PDERSON
+    	personBusinessValidator.updatePersonValidation(person,id);
     	
-    	 ElasticPerson elasaticPerson = elasPersonRepository.findById(id).get();
-    	 if(elasaticPerson==null)
-    		  throw new Exception("User is not exist with of Id number ");
+    	 Person existPerson =  personRepository.findById(id).get();
+    	 existPerson.setUserName(person.getUserName());                         
+         existPerson.setFirstName(person.getFirstName());                       
+         existPerson.setLastName(person.getLastName());                          
+         existPerson.setAddress(person.getAddress());
+         existPerson.setMobileNo(person.getMobileNo());
+         existPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
+         personRepository.save(existPerson);
     	 
+         ElasticPerson elasaticPerson =  elasPersonRepository.findById(id).get();
     	 elasaticPerson.setUserName(person.getUserName());                         
     	 elasaticPerson.setFirstName(person.getFirstName());                       
     	 elasaticPerson.setLastName(person.getLastName());                          
@@ -71,58 +86,43 @@ public class PersonService  {
     	 elasaticPerson.setMobileNo(person.getMobileNo());
     	 elasaticPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
     	 elasPersonRepository.save(elasaticPerson);
-    	 
-    	 Person existPerson =  personRepository.findById(id).get();
-    	 
-         existPerson.setUserName(person.getUserName());                         
-         existPerson.setFirstName(person.getFirstName());                       
-         existPerson.setLastName(person.getLastName());                          
-         existPerson.setAddress(person.getAddress());
-         existPerson.setMobileNo(person.getMobileNo());
-         existPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
-         personRepository.save(existPerson);
-         
+           
     }
     
     //TO STORE A PERSON RECORD
-    public void saveUser(PersonRequestEntity user) throws Exception
+    public void saveUser(PersonRequestEntity person) throws Exception
     {
+    	//TO CHECk THAT, USER IS ALREADY EXIST OR NOT
+    	personBusinessValidator.createPersonValidation(person);
     	
-    	//FATCH FROM ELASTICSEARCH DATABASE
-    	Person existPerson = personRepository.findByMobileNo(user.getMobileNo());
-       
-    	//TO CHECK THAT WHEATHER THE PERSON EXIST OR NOT 
-        if(existPerson!=null)
-        	throw new Exception("person is already exist"); 
-        
         Person realUser=new Person();
-    	realUser.setPassword(bcryptEncoder.encode(user.getPassword()));         
-    	realUser.setUserName(user.getUserName());
-    	realUser.setAddress(user.getAddress());
-    	realUser.setFirstName(user.getFirstName());
-    	realUser.setLastName(user.getLastName());
-    	realUser.setMobileNo(user.getMobileNo());
-    	realUser.setEmail(user.getEmail());
+    	realUser.setPassword(bcryptEncoder.encode(person.getPassword()));         
+    	realUser.setUserName(person.getUserName());
+    	realUser.setAddress(person.getAddress());
+    	realUser.setFirstName(person.getFirstName());
+    	realUser.setLastName(person.getLastName());
+    	realUser.setMobileNo(person.getMobileNo());
+    	realUser.setEmail(person.getEmail());
     	realUser.setRegisterDate(new Date());
     	realUser.setStatus(PersonStatus.ACTIVE.name());
-    	
     	//TO SAVE RECORD IN MYSQL DATABASE
-    	personRepository.save(realUser);
+    	Person tempPerson=personRepository.save(realUser);
         
         ElasticPerson elasticPerson = new ElasticPerson();
-        elasticPerson.setUserName(user.getUserName());
-        elasticPerson.setAddress(user.getAddress());
-        elasticPerson.setEmail(user.getEmail());
-        elasticPerson.setFirstName(user.getFirstName());
-        elasticPerson.setLastName(user.getLastName());
-        elasticPerson.setMobileNo(user.getMobileNo());
-        elasticPerson.setPassword(bcryptEncoder.encode(user.getPassword()));
+        elasticPerson.setUserName(person.getUserName());
+        elasticPerson.setAddress(person.getAddress());
+        elasticPerson.setEmail(person.getEmail());
+        elasticPerson.setUserId(tempPerson.getUserId());
+        elasticPerson.setFirstName(person.getFirstName());
+        elasticPerson.setLastName(person.getLastName());
+        elasticPerson.setMobileNo(person.getMobileNo());
+        elasticPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
         elasticPerson.setRegisterDate(realUser.getRegisterDate());
-        elasticPerson.setStatus(PersonStatus.ACTIVE.name());
-        
+        elasticPerson.setStatus(PersonStatus.ACTIVE.name());  
         // TO SAVE RECORD IN ELASTICSEARCH DATABASE
         elasPersonRepository.save(elasticPerson);
                                                                                               
     }
-    
+
 }
+    

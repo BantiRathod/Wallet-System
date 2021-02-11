@@ -40,8 +40,12 @@ public class PersonController
 	 @GetMapping("/person/{id}")
 	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {
 	     try {
+	    	 //TO VALIDATE PASSED ID 
 	    	  personRequestBodyValidator.personRequestIdValidation(id);
+	    	  
 	    	 ElasticPerson person = personService.getPerson(id);
+	    	 logger.info("responsed person {}",person);
+	    	 
 	         return new ResponseEntity<ElasticPerson> (person, HttpStatus.OK);
 	     } catch (NoSuchElementException e) {
 	    	 logger.error("Exception occured, "+e.getMessage());
@@ -59,6 +63,8 @@ public class PersonController
 		 logger.info("PersonRequestEntity received from user {}",user);
 	     try
 	     {
+	    	 //TO VALIDATE REQUEST BODY'S FIELDS VALID OR NOT
+	    	 personRequestBodyValidator.createPersonValidation(user);
 	    	 
 	    	 personService.saveUser(user);	 
 	         return new ResponseEntity<String>("person registered successfully And userName= "+user.getUserName()+", password= "+user.getPassword(),HttpStatus.OK);
@@ -93,14 +99,15 @@ public class PersonController
 	 {
 		 try
 		 {
+			// TO VALIDATE PASSED ID 
 			personRequestBodyValidator.personRequestIdValidation(id);
+			
 		    Person person= personService.getPersonMysql(id);  
 		    personService.deletePerson(id);
 		    logger.info("deleted person {}, " + person);
-		   return new ResponseEntity<Person>(person,HttpStatus.OK);      
+		    return new ResponseEntity<Person>(person,HttpStatus.OK);      
 	     }
-		  catch(Exception e)
-		  {
+		     catch(Exception e) {
 			 logger.error("Exception occured, "+e.getMessage());
 			 return new ResponseEntity<Person>(HttpStatus.NOT_FOUND);
 		  }

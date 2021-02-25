@@ -17,7 +17,8 @@
 import com.banti.wallet.ums.jwtSpringSecutity.services.JwtUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
-  @Component
+
+@Component
   public class JwtRequestFilter extends OncePerRequestFilter {
 	  
   	@Autowired

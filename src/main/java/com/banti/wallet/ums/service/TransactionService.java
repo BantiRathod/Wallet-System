@@ -18,7 +18,6 @@ import com.banti.wallet.ums.elasticsearch.models.ElasticWalletTransaction;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticPersonWalletRepository;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticWalletTransactionRepository;
 import com.banti.wallet.ums.enums.TxnType;
-import com.banti.wallet.ums.kafkaServices.KafkaTransactionConsumer;
 import com.banti.wallet.ums.kafkaServices.KafkaTransactionProducer;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.Person;
@@ -38,8 +37,7 @@ public class TransactionService
 
 	@Autowired
 	private KafkaTransactionProducer kafkaTransactionProducer;
-	@Autowired
-	private KafkaTransactionConsumer kafkaTransactionConsumer;
+	
 	@Autowired
 	private PersonWalletRepository personWalletRepository;
 	@Autowired
@@ -93,33 +91,46 @@ public class TransactionService
 		return elasticWalletTransactionRepository.findById(id).get();
 	}
 	
+	//TO SAVE IN WALLET_TRANSACTION INDEX
+	public void saveElasticTransaction(ElasticWalletTransaction elasticWalletTransaction)
+	{
+		 elasticWalletTransactionRepository.save(elasticWalletTransaction);
+	}
+	
 	public WalletTransaction saveTransaction(WalletTransaction transaction) throws Exception
 	{
 		//TRANSACTION HAS BEEN SAVED IN MYSQL DATABASE
 		WalletTransaction walletTransaction = transactionrepository.save( transaction);
 		
+		logger.info("pused transaction: {}",walletTransaction);
 		// TO PRODUCE TRANSACTION IN KAFKA BEFORE ELASTIC SEARCH 
+		
 		kafkaTransactionProducer.transactionProducer(walletTransaction);
 		
-		// TO CONSUME TRANSACTION FROM KAFKA
-		String emptyString="";
-		WalletTransaction consumedTransaction = kafkaTransactionConsumer.transactionConsumer(emptyString);
-	
+		// **** MOVED ELASTICTRANSACTION CREATION PART TO KAFKA CONSUMER METHOD***
 		
-		ElasticWalletTransaction elasticWalletTransaction = new ElasticWalletTransaction();
-		
-		elasticWalletTransaction.setAmount(consumedTransaction.getAmount());
-		elasticWalletTransaction.setId(walletTransaction.getId());
-		elasticWalletTransaction.setOrderId(consumedTransaction.getOrderId());
-		elasticWalletTransaction.setPayeeMobileNo(consumedTransaction.getPayeeMobileNo());
-		elasticWalletTransaction.setPayerMobileNo(consumedTransaction.getPayerMobileNo());
-		elasticWalletTransaction.setPayeeRemainingAmount(consumedTransaction.getPayeeRemainingAmount());
-		elasticWalletTransaction.setPayerRemainingAmount(consumedTransaction.getPayerRemainingAmount());
-		elasticWalletTransaction.setStatus(consumedTransaction.getStatus());
-		elasticWalletTransaction.setTransactionDate(consumedTransaction.getTransactionDate());
-		elasticWalletTransaction.setTransactionType(consumedTransaction.getTransactionType());
-		//TO STORE TRANSACTION IN ELASTICSEARCH DATABASE
-		elasticWalletTransactionRepository.save(elasticWalletTransaction);
+		/*
+		 * ElasticWalletTransaction elasticWalletTransaction = new
+		 * ElasticWalletTransaction();
+		 * 
+		 * elasticWalletTransaction.setAmount(consumedTransaction.getAmount());
+		 * elasticWalletTransaction.setId(walletTransaction.getId());
+		 * elasticWalletTransaction.setOrderId(consumedTransaction.getOrderId());
+		 * elasticWalletTransaction.setPayeeMobileNo(consumedTransaction.
+		 * getPayeeMobileNo());
+		 * elasticWalletTransaction.setPayerMobileNo(consumedTransaction.
+		 * getPayerMobileNo());
+		 * elasticWalletTransaction.setPayeeRemainingAmount(consumedTransaction.
+		 * getPayeeRemainingAmount());
+		 * elasticWalletTransaction.setPayerRemainingAmount(consumedTransaction.
+		 * getPayerRemainingAmount());
+		 * elasticWalletTransaction.setStatus(consumedTransaction.getStatus());
+		 * elasticWalletTransaction.setTransactionDate(consumedTransaction.
+		 * getTransactionDate());
+		 * elasticWalletTransaction.setTransactionType(consumedTransaction.
+		 * getTransactionType()); //TO STORE TRANSACTION IN ELASTICSEARCH DATABASE
+		 * elasticWalletTransactionRepository.save(elasticWalletTransaction);
+		 */
 		return walletTransaction;
 	}
 	
@@ -191,7 +202,7 @@ public class TransactionService
 	}
 	
 	
-	// TO DO MONEY TRANSFER  FROM PERSON TO PERSON
+   // ## TO DO MONEY TRANSFER  FROM PERSON TO PERSON
 	public WalletTransaction doMoneyTransferToPerson(TransactionRequest request,Map<String, Object> p2pContext)
 	{
 		 

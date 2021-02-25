@@ -3,7 +3,6 @@ package com.banti.wallet.ums.kafkaServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
 import com.banti.wallet.ums.model.WalletTransaction;
 import com.google.gson.Gson;
 

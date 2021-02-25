@@ -18,6 +18,8 @@ import com.banti.wallet.ums.elasticsearch.models.ElasticWalletTransaction;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticPersonWalletRepository;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticWalletTransactionRepository;
 import com.banti.wallet.ums.enums.TxnType;
+import com.banti.wallet.ums.kafkaServices.KafkaTransactionConsumer;
+import com.banti.wallet.ums.kafkaServices.KafkaTransactionProducer;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.model.PersonWallet;
@@ -33,7 +35,11 @@ import com.banti.wallet.ums.validator.business.TransactionBusinessValidator;
 public class TransactionService
 {
 	Logger logger=LoggerFactory.getLogger(TransactionService.class);
-	
+
+	@Autowired
+	private KafkaTransactionProducer kafkaTransactionProducer;
+	@Autowired
+	private KafkaTransactionConsumer kafkaTransactionConsumer;
 	@Autowired
 	private PersonWalletRepository personWalletRepository;
 	@Autowired
@@ -48,7 +54,6 @@ public class TransactionService
 	private PersonWalletService personWalletService;
 	@Autowired
 	private TransactionBusinessValidator transactionBusinessValidator;
- 
 	@Autowired
 	@Qualifier(value ="personWalletService")
 	private MoneyMovementService personMoneyMovementService;
@@ -70,7 +75,8 @@ public class TransactionService
                   list.addAll(userTransactionListpayerTime);
         return (Iterable<ElasticWalletTransaction>)list;
 	
-	/*                  // BEFORE THE ELASTICSEARCH DATABASE
+     // BEFORE THE ELASTICSEARCH DATABASE, GOT RESULT IN PAGEABLE FORM
+     /*                  
 	 * Pageable pageable = PageRequest.of(paginationRequest.getPageNo(),
 	 * paginationRequest.getPageSize(), Sort.Direction.ASC, "id"); return
 	 * transactionrepository.findAllByPayerNo(person.getMobileNo(),pageable); }
@@ -87,20 +93,31 @@ public class TransactionService
 		return elasticWalletTransactionRepository.findById(id).get();
 	}
 	
-	public WalletTransaction saveTransaction(WalletTransaction transaction)
+	public WalletTransaction saveTransaction(WalletTransaction transaction) throws Exception
 	{
+		//TRANSACTION HAS BEEN SAVED IN MYSQL DATABASE
 		WalletTransaction walletTransaction = transactionrepository.save( transaction);
+		
+		// TO PRODUCE TRANSACTION IN KAFKA BEFORE ELASTIC SEARCH 
+		kafkaTransactionProducer.transactionProducer(walletTransaction);
+		
+		// TO CONSUME TRANSACTION FROM KAFKA
+		String emptyString="";
+		WalletTransaction consumedTransaction = kafkaTransactionConsumer.transactionConsumer(emptyString);
+	
+		
 		ElasticWalletTransaction elasticWalletTransaction = new ElasticWalletTransaction();
-		elasticWalletTransaction.setAmount(transaction.getAmount());
+		
+		elasticWalletTransaction.setAmount(consumedTransaction.getAmount());
 		elasticWalletTransaction.setId(walletTransaction.getId());
-		elasticWalletTransaction.setOrderId(transaction.getOrderId());
-		elasticWalletTransaction.setPayeeMobileNo(transaction.getPayeeMobileNo());
-		elasticWalletTransaction.setPayerMobileNo(transaction.getPayerMobileNo());
-		elasticWalletTransaction.setPayeeRemainingAmount(transaction.getPayeeRemainingAmount());
-		elasticWalletTransaction.setPayerRemainingAmount(transaction.getPayerRemainingAmount());
-		elasticWalletTransaction.setStatus(transaction.getStatus());
-		elasticWalletTransaction.setTransactionDate(transaction.getTransactionDate());
-		elasticWalletTransaction.setTransactionType(transaction.getTransactionType());
+		elasticWalletTransaction.setOrderId(consumedTransaction.getOrderId());
+		elasticWalletTransaction.setPayeeMobileNo(consumedTransaction.getPayeeMobileNo());
+		elasticWalletTransaction.setPayerMobileNo(consumedTransaction.getPayerMobileNo());
+		elasticWalletTransaction.setPayeeRemainingAmount(consumedTransaction.getPayeeRemainingAmount());
+		elasticWalletTransaction.setPayerRemainingAmount(consumedTransaction.getPayerRemainingAmount());
+		elasticWalletTransaction.setStatus(consumedTransaction.getStatus());
+		elasticWalletTransaction.setTransactionDate(consumedTransaction.getTransactionDate());
+		elasticWalletTransaction.setTransactionType(consumedTransaction.getTransactionType());
 		//TO STORE TRANSACTION IN ELASTICSEARCH DATABASE
 		elasticWalletTransactionRepository.save(elasticWalletTransaction);
 		return walletTransaction;
@@ -110,7 +127,7 @@ public class TransactionService
 	@Transactional
 	public WalletTransaction performP2M(TransactionRequest request, Map<String, Object> p2mContext) throws Exception {
 		
-		logger.info("current context {}",p2mContext);
+		logger.info("current context {}", p2mContext);
 		
 		transactionBusinessValidator.p2mValidation(request, p2mContext);
 		
@@ -124,7 +141,7 @@ public class TransactionService
 		return walletTransaction;	
 	}
 	
-	private WalletTransaction createTransaction(TransactionRequest request, WalletTransaction transaction) {
+	private WalletTransaction createTransaction(TransactionRequest request, WalletTransaction transaction) throws Exception {
 		
 		transaction.setStatus("transaction succesful");
 		transaction.setPayeeMobileNo(request.getPayeeMobileNo());
@@ -191,7 +208,7 @@ public class TransactionService
 		return transaction;
 	}
 	
-	public WalletTransaction createTransactionP2P(TransactionRequest request, WalletTransaction transaction)
+	public WalletTransaction createTransactionP2P(TransactionRequest request, WalletTransaction transaction) throws Exception
 	{
 		transaction.setStatus("transaction succesful");
 		transaction.setPayeeMobileNo(request.getPayeeMobileNo());
@@ -216,7 +233,7 @@ public class TransactionService
 		return  tempWalletTransaction;
 	}
 	
-	public WalletTransaction createTransactionForAddMoney(WalletTransaction transaction ,AddMoneyTransactionRequest request) 
+	public WalletTransaction createTransactionForAddMoney(WalletTransaction transaction ,AddMoneyTransactionRequest request) throws Exception 
 	{
 		transaction.setStatus("transaction succesful");
 		transaction.setPayeeMobileNo(request.getMobileNo());

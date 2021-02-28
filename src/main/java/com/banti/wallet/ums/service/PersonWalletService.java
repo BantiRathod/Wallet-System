@@ -12,7 +12,7 @@ import com.banti.wallet.ums.elasticsearch.models.ElasticPersonWallet;
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticPersonWalletRepository;
 import com.banti.wallet.ums.enums.AccountStatus;
 import com.banti.wallet.ums.model.BaseWallet;
-
+//import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.repository.PersonWalletRepository;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
@@ -99,7 +99,11 @@ public class PersonWalletService implements MoneyMovementService {
 		logger.info("received debit request of amount {} from user wallet {}",amount,personWallet);
 		personWallet.setBalance(personWallet.getBalance()-amount);
 		
-		PersonWallet updatedWallet=personWalletRepository.save(personWallet);
+		// KNOW IN DETAIL ABOUT IT BY MERCHANT WALLET UPDATE TIME
+		PersonWallet  newPersonWallet = new PersonWallet(personWallet.getMobileNo(),personWallet.getBalance()
+				,personWallet.getStatus(),personWallet.getCreatedDate());
+		
+		PersonWallet updatedWallet=personWalletRepository.save(newPersonWallet);
 		
 		logger.info("merchant balance is {} after deducting amount{}",personWallet.getBalance(),amount);
 		return updatedWallet;
@@ -113,7 +117,10 @@ public class PersonWalletService implements MoneyMovementService {
 		
 		personWallet.setBalance(personWallet.getBalance()+amount);
 		
-		PersonWallet updatedWallet=personWalletRepository.save(personWallet);
+		PersonWallet  newPersonWallet = new PersonWallet(personWallet.getMobileNo(),personWallet.getBalance()
+				,personWallet.getStatus(),personWallet.getCreatedDate());
+		
+		PersonWallet updatedWallet=personWalletRepository.save(newPersonWallet);
 		
 		logger.info("person balance is {} after credit amount{}",personWallet.getBalance(),amount);
 		return updatedWallet;

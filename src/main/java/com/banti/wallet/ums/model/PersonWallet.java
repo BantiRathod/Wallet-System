@@ -11,6 +11,16 @@ public class PersonWallet extends BaseWallet{
 	private Double balance;
 	private String status;
 	private Date createdDate;
+	
+	public PersonWallet() {}
+	
+	public PersonWallet(String mobileNo, Double balance, String status, Date createdDate) {
+		this.mobileNo = mobileNo;
+		this.balance = balance;
+		this.status = status;
+		this.createdDate = createdDate;
+	}
+	
 	public String getMobileNo() {
 		return mobileNo;
 	}

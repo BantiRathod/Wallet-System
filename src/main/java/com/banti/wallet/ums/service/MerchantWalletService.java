@@ -95,7 +95,16 @@ public class MerchantWalletService implements MoneyMovementService
 		MerchantWallet merchantWallet=(MerchantWallet) wallet;
 		logger.info("received debit request of amount {} from merchant {}",amount,merchantWallet);
 		merchantWallet.setBalance(merchantWallet.getBalance()-amount);
-		MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(merchantWallet);
+		
+		/*
+		 * HERE WE ADDED WE ARE CREATED NEW MERCHANT WALLET OBJECT TO SAVE IN THE DATA
+		 * BASE AFTER UPDATE WALLET BALANCE, BECAUSE WHICH OBJECT WE RETEIVE FROM DATA BASE THIS IS "PROXY" OF THAT OBJECT
+		 * , WHEN WE SAVE IT THEN IT WOULD UPDATE THE PREVIOUS ONE RECORD  
+		 */
+		MerchantWallet newMerchantWallet = new MerchantWallet(merchantWallet.getMobileNo(),merchantWallet.getBalance(),
+				merchantWallet.getMerchantWalletcreatedDate(),merchantWallet.getStatus());
+		
+		MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(newMerchantWallet);
 		logger.info("merchant balance is {} after deducting amount{}", updatedMerchantWallet.getBalance(),amount);
 		
 		return  updatedMerchantWallet;
@@ -105,8 +114,13 @@ public class MerchantWalletService implements MoneyMovementService
 	public BaseWallet creditMoney(BaseWallet wallet, double amount) {
 		MerchantWallet merchantWallet=(MerchantWallet) wallet;
 		logger.info("received credit request of amount {} from merchant {}",amount,merchantWallet);
+		
 		 merchantWallet.setBalance(merchantWallet.getBalance()+amount);
-		 MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(merchantWallet);
+		 
+		 MerchantWallet newMerchantWallet = new MerchantWallet(merchantWallet.getMobileNo(),merchantWallet.getBalance(),
+					merchantWallet.getMerchantWalletcreatedDate(),merchantWallet.getStatus());
+		 
+		 MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(newMerchantWallet);
 		 logger.info("merchant balance is {} after crediting amount {}"+ updatedMerchantWallet.getBalance());
 		return  updatedMerchantWallet;
 	}

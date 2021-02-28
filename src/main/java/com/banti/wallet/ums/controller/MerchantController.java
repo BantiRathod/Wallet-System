@@ -39,10 +39,12 @@ public ResponseEntity<Iterable<ElasticMerchant>> toGetlistOfAllMerchants()
 	try
 	{
             Iterable<ElasticMerchant> list=merchantService.getListOfAllMerchants();
+            logger.info("responsed merchants record, {}",list);
             return new ResponseEntity<Iterable<ElasticMerchant>>(list,HttpStatus.OK);
 	}
 	catch(NoSuchElementException e)
 	{
+		  logger.error("Exception occured {}", e.getMessage());
 		  return new ResponseEntity<Iterable<ElasticMerchant>>(HttpStatus.NOT_FOUND);
 	}	
 }

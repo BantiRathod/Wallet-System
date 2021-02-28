@@ -19,7 +19,7 @@ public class Merchant
 		private String email;
 		private String mobileNo;
 		private String status;
-		private String password;
+
 		
 		public Long getMerchantId() {
 			return merchantId;
@@ -65,17 +65,11 @@ public class Merchant
 			this.status = status;
 		}
 		
-		public String getPassword() {
-			return password;
-		}
-		public void setPassword(String password) {
-			this.password = password;
-		}
 		@Override
 		public String toString() {
 			return "Merchant [merchantId=" + merchantId + ", shopName=" + shopName + ", address=" + address
 					+ ", registerDate=" + registerDate + ", email=" + email + ", mobileNo=" + mobileNo + ", status="
-					+ status + ", password=" + password + "]";
+					+ status+ "]";
 		}
 		
 	

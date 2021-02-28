@@ -69,16 +69,22 @@ public class PersonService  {
     	//TO BUSINESS VALIADTE FOR UPDTE PDERSON
     	personBusinessValidator.updatePersonValidation(person,id);
     	
-    	 Person existPerson =  personRepository.findById(id).get();
-    	 existPerson.setUserName(person.getUserName());                         
-         existPerson.setFirstName(person.getFirstName());                       
-         existPerson.setLastName(person.getLastName());                          
-         existPerson.setAddress(person.getAddress());
-         existPerson.setMobileNo(person.getMobileNo());
-         existPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
-         personRepository.save(existPerson);
+    	// Person existPerson =  personRepository.findById(id).get();
+    	// Dont MAKE CHANGES IN RETRIEVED OBJECT, INSTEAD OF IT CREATE NEW OBJECT THEN SAVE IT
+    	 Person newPerson = new Person();
     	 
-         ElasticPerson elasaticPerson =  elasPersonRepository.findById(id).get();
+    	 newPerson.setUserId(id);
+    	 newPerson.setUserName(person.getUserName());                         
+    	 newPerson.setFirstName(person.getFirstName());                       
+    	 newPerson.setLastName(person.getLastName());                          
+         newPerson.setAddress(person.getAddress());
+         newPerson.setMobileNo(person.getMobileNo());
+         newPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
+         personRepository.save(newPerson);
+    	 
+         //ElasticPerson elasaticPerson =  elasPersonRepository.findById(id).get();
+         ElasticPerson elasaticPerson = new ElasticPerson();
+         elasaticPerson.setUserId(id);
     	 elasaticPerson.setUserName(person.getUserName());                         
     	 elasaticPerson.setFirstName(person.getFirstName());                       
     	 elasaticPerson.setLastName(person.getLastName());                          
@@ -108,6 +114,7 @@ public class PersonService  {
     	//TO SAVE RECORD IN MYSQL DATABASE
     	Person tempPerson=personRepository.save(realUser);
         
+    	
         ElasticPerson elasticPerson = new ElasticPerson();
         elasticPerson.setUserName(person.getUserName());
         elasticPerson.setAddress(person.getAddress());

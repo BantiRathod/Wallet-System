@@ -35,6 +35,7 @@ public class MerchantWalletController
 	{
 		try{
 	         Iterable<ElasticMerchantWallet> list= merchantWalletService.getListOfAllMerchantWallet();
+	         logger.info("received merchant wallet list, {}", list);
 	         return new ResponseEntity<Iterable<ElasticMerchantWallet>>(list,HttpStatus.OK);
 		}
 		catch(Exception e){

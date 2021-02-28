@@ -31,11 +31,21 @@ public class PersonController
 
    
 	 @GetMapping("/persons")
-	 public Iterable<ElasticPerson> fatchAllPerson()
-	 {
-	    return personService.listAllPerson();
+	 public ResponseEntity<Iterable<ElasticPerson>> fatchAllPerson() {
+	     try {
+	    	  
+	    	 Iterable<ElasticPerson> persons = personService.listAllPerson();
+	    	 logger.info("responsed person {}",persons); 
+	         return new ResponseEntity<Iterable<ElasticPerson>> (persons, HttpStatus.OK);
+	     } catch (NoSuchElementException e) {
+	    	 logger.error("Exception occured, "+e.getMessage());
+	         return new ResponseEntity<Iterable<ElasticPerson>>(HttpStatus.NOT_FOUND);
+	     } catch(Exception e)
+	     {
+	    	 logger.error("Exception occured, "+e.getMessage());
+	    	 return new ResponseEntity<Iterable<ElasticPerson>>(HttpStatus.NOT_FOUND);
+	     }
 	 }
-	 
 	
 	 @GetMapping("/person/{id}")
 	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {

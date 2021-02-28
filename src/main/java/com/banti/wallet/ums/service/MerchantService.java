@@ -2,7 +2,6 @@ package com.banti.wallet.ums.service;
 
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +21,11 @@ public class MerchantService
   
   @Autowired
   private MerchantBusinessValidator merchantBusinessValidator;
-  @Autowired
-  private PasswordEncoder bcrptEncoder;
+
+	/*
+	 * private PasswordEncoder bcrptEncoder; 
+	 * @Autowired
+	 */
   @Autowired
   private MerchantRepository merchantRepository;
   @Autowired
@@ -72,7 +74,6 @@ public class MerchantService
 		 tempMerchant.setShopName(merchant.getShopName());
 		 tempMerchant.setAddress(merchant.getAddress());
 		 tempMerchant.setEmail(merchant.getEmail());
-		 tempMerchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
 		 tempMerchant.setRegisterDate(new Date());
 		 tempMerchant.setStatus(PersonStatus.ACTIVE.name());
 		 // MERCHANT RECORD HAS BEEN STORED IN MYSQL
@@ -84,7 +85,7 @@ public class MerchantService
 		 elasticMerchant.setRegisterDate(tempMerchant.getRegisterDate());
 		 elasticMerchant.setEmail(merchant.getEmail());
 		 elasticMerchant.setMobileNo(merchant.getMobileNo());
-		 elasticMerchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
+	
 		 elasticMerchant.setShopName(merchant.getShopName());
 		 elasticMerchant.setStatus(PersonStatus.ACTIVE.name());
 		 elasticMerchant.setMerchantId( returnMerchant.getMerchantId());
@@ -100,24 +101,27 @@ public class MerchantService
 		 //BUSINESS VALIDATION
 		 merchantBusinessValidator.updateMerchantvalidation(merchant, id);
 		 
+		//HERE WE WILL UPDATE ONLY THOSE FIELDS WHICH ARE UPDATABLE 
 		 ElasticMerchant elasticMerchant = new ElasticMerchant();
 		 elasticMerchant.setAddress(merchant.getAddress());
 		 elasticMerchant.setEmail(merchant.getEmail());
 		 elasticMerchant.setMobileNo(merchant.getMobileNo());
-		 elasticMerchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
+         elasticMerchant.setMerchantId(id);
 		 elasticMerchant.setShopName(merchant.getShopName());
 		 
 		 elasticMerchantRepository.save(elasticMerchant);
 		 
-		 //HERE WE WILL UPDATE ONLY THOSE FIELDS WHICH ARE UPDATABLE 
-		 Merchant tempmarchant = merchantRepository.findById(id).get();
-		 tempmarchant.setAddress(merchant.getAddress());
-		 tempmarchant.setEmail(merchant.getEmail());
-		 tempmarchant.setMobileNo(merchant.getMobileNo());
-		 tempmarchant.setPassword(bcrptEncoder.encode(merchant.getPassword()));
-		 tempmarchant.setShopName(merchant.getShopName());
+		 //Merchant tempmarchant = merchantRepository.findById(id).get();
 		 
-		 merchantRepository.save(tempmarchant); 
+		 //DONT SAVE PROXY OBJECT RETREIVED FROM DATA BASE INSTEAD OF IT PUSH NEW OBJECT
+		 Merchant newMerchant=new Merchant();
+		 newMerchant.setAddress(merchant.getAddress());
+		 newMerchant.setEmail(merchant.getEmail());
+		 newMerchant.setMobileNo(merchant.getMobileNo());
+		 newMerchant.setMerchantId(id);
+		 newMerchant.setShopName(merchant.getShopName());
+		 
+		 merchantRepository.save(newMerchant); 
 	 }
 
    

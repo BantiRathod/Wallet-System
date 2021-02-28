@@ -25,8 +25,6 @@ public class ElasticMerchant {
 	private String mobileNo;
 	@Field(type=FieldType.Text, name="status")
 	private String status;
-	@Field(type=FieldType.Text, name="password")
-	private String password;
 	
 	public Long getMerchantId() {
 		return merchantId;
@@ -71,18 +69,12 @@ public class ElasticMerchant {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
+
 	@Override
 	public String toString() {
 		return "Merchant [merchantId=" + merchantId + ", shopName=" + shopName + ", address=" + address
 				+ ", registerDate=" + registerDate + ", email=" + email + ", mobileNo=" + mobileNo + ", status="
-				+ status + ", password=" + password + "]";
+				+ status + "]";
 	}
 	
 

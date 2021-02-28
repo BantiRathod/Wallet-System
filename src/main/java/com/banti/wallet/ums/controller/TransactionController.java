@@ -46,7 +46,7 @@ public class TransactionController {
 	private PersonService personService;
 	 
 
-	@GetMapping("/transactionSummary/{userId}")
+	@GetMapping("/transactionSummary")
 	public ResponseEntity<Iterable<ElasticWalletTransaction>> getTransactionSummary(@PathVariable Long userId ) {
 		logger.info("paginationRequest received {}", userId);
 		

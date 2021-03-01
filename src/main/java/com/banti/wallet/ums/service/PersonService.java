@@ -69,7 +69,7 @@ public class PersonService  {
     	//TO BUSINESS VALIADTE FOR UPDTE PDERSON
     	personBusinessValidator.updatePersonValidation(person,id);
     	
-    	// Person existPerson =  personRepository.findById(id).get();
+    	 Person existPerson =  personRepository.findById(id).get();
     	// Dont MAKE CHANGES IN RETRIEVED OBJECT, INSTEAD OF IT CREATE NEW OBJECT THEN SAVE IT
     	 Person newPerson = new Person();
     	 
@@ -79,6 +79,8 @@ public class PersonService  {
     	 newPerson.setLastName(person.getLastName());                          
          newPerson.setAddress(person.getAddress());
          newPerson.setMobileNo(person.getMobileNo());
+         newPerson.setRegisterDate(existPerson.getRegisterDate());
+         newPerson.setStatus(existPerson.getStatus());
          newPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
          personRepository.save(newPerson);
     	 
@@ -89,6 +91,8 @@ public class PersonService  {
     	 elasaticPerson.setFirstName(person.getFirstName());                       
     	 elasaticPerson.setLastName(person.getLastName());                          
     	 elasaticPerson.setAddress(person.getAddress());
+    	 elasaticPerson.setRegisterDate(elasaticPerson.getRegisterDate());
+    	 elasaticPerson.setStatus(elasaticPerson.getStatus());
     	 elasaticPerson.setMobileNo(person.getMobileNo());
     	 elasaticPerson.setPassword(bcryptEncoder.encode(person.getPassword()));
     	 elasPersonRepository.save(elasaticPerson);

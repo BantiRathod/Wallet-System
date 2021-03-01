@@ -101,8 +101,8 @@ public class TransactionService
 	{
 		//TRANSACTION HAS BEEN SAVED IN MYSQL DATABASE
 		WalletTransaction walletTransaction = transactionrepository.save( transaction);
-		
 		logger.info("pused transaction: {}",walletTransaction);
+		
 		// TO PRODUCE TRANSACTION IN KAFKA BEFORE ELASTIC SEARCH 
 		
 		kafkaTransactionProducer.transactionProducer(walletTransaction);
@@ -261,22 +261,25 @@ public class TransactionService
 	public WalletTransaction addMoneyInWallet(AddMoneyTransactionRequest request)
 	{
 		
-		ElasticPersonWallet personWallet = personWalletService.getPersonWallet(request.getMobileNo());
-		
-		WalletTransaction walletTransaction = new WalletTransaction();
+		PersonWallet personWallet = personWalletService.getPersonWalletFromMysql(request.getMobileNo());
 		logger.info("wallet money before transaction {}",personWallet.getBalance());
 		
-		personWallet.setBalance(request.getAmount() + personWallet.getBalance());
+		WalletTransaction walletTransaction = new WalletTransaction();
+		walletTransaction.setPayeeRemainingAmount(personWallet.getBalance()+request.getAmount());
 		
-		logger.info("wallet money after transaction {}",personWallet.getBalance());
-		walletTransaction.setPayeeRemainingAmount(personWallet.getBalance());
+		PersonWallet newPersonWallet = new PersonWallet(request.getMobileNo(), personWallet.getBalance()+request.getAmount(),
+				personWallet.getStatus(), personWallet.getCreatedDate());
+		
+		personWalletRepository.save(newPersonWallet);
+		logger.info("wallet money after transaction {}",newPersonWallet.getBalance());
+		
+		ElasticPersonWallet newElasaticpersonWallet = new ElasticPersonWallet(request.getMobileNo(),newPersonWallet.getBalance(),
+				newPersonWallet.getStatus(),newPersonWallet.getCreatedDate());
+		
 		//TO STORE IN ELASTIC SEARCH
-		elasticPersonWalletRepository.save(personWallet);
+		elasticPersonWalletRepository.save( newElasaticpersonWallet);
 		
-		PersonWallet tempPersonWallet = personWalletRepository.findById(request.getMobileNo()).get();
-		tempPersonWallet.setBalance(personWallet.getBalance());
-		//TO STORE IN MYSQL
-		personWalletRepository.save(tempPersonWallet);
+		
 		return walletTransaction;
 		
 	}

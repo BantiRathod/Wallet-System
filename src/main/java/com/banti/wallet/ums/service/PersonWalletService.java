@@ -50,6 +50,7 @@ public class PersonWalletService implements MoneyMovementService {
 	 }
 	
 	 
+	 
 	 public void createPersonWallet(PersonWalletRequest wallet)
 	 {
 		 PersonWallet personWallet = new PersonWallet();
@@ -81,14 +82,20 @@ public class PersonWalletService implements MoneyMovementService {
 	{
 		personWalletBusinessValidator.updatePersonWalletValidatoion(wallet,mobileNo);
 		
-		 PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
-		 personWallet.setMobileNo(wallet.getMobileNo());
-		 personWalletRepository.save(personWallet);
+	   	 PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
+	   	 
+		 PersonWallet newPersonWallet = new  PersonWallet(wallet.getMobileNo(), personWallet.getBalance(), personWallet.getStatus(),
+				 personWallet.getCreatedDate());
+		 
+	     //SAVE NEW PRESON WALLET OBJECT
+		 personWalletRepository.save(newPersonWallet);
 		
 		 ElasticPersonWallet elasticPersonWallet = elasticPersonWalletRepository.findById(mobileNo).get();
-		 elasticPersonWallet.setMobileNo(wallet.getMobileNo());
-		 elasticPersonWalletRepository.save(elasticPersonWallet);
-	
+		 
+		 ElasticPersonWallet newElasticPersonWallet = new  ElasticPersonWallet(wallet.getMobileNo(), elasticPersonWallet.getBalance(), elasticPersonWallet.getStatus(),
+				 elasticPersonWallet.getCreatedDate());
+		 //SAVE NEW PRESON WALLET OBJECT
+		 elasticPersonWalletRepository.save(newElasticPersonWallet);
 	}
 	
 // rename user wallet to person wallet

@@ -1,6 +1,10 @@
 package com.banti.wallet.ums.validator.business;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.banti.wallet.ums.constant.ContextConstant;
@@ -30,9 +34,8 @@ public class TransactionBusinessValidator {
 	private MerchantWalletService merchantWalletService;
 	@Autowired
 	private PersonWalletService personWalletService;
-	/*
-	 * @Autowired private BankService bankService;
-	 */
+	
+	Logger logger = LoggerFactory.getLogger(TransactionBusinessValidator.class);
 
 	
 	//FOR P2M VALIDATION
@@ -81,34 +84,63 @@ public class TransactionBusinessValidator {
 	
 	//FOR P2P VALIDATION
 	public void p2pValidation(TransactionRequest request, Map<String, Object> p2pContext ) throws Exception {
-		//CHECK PAYER USER EXIST 
-		Person payerPerson = personService.findPersonByMobileNoMysql(request.getPayerMobileNo());
 		
-		if(payerPerson==null) 
-			throw new Exception("payer person account not exist in system with mobile number "+request.getPayerMobileNo());	
-		else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payerPerson.getStatus()))
-			throw new Exception("person account is not active");
+		//CHECK PAYER USER EXIST 
+		 Person payerPerson;
+			try
+			{
+				payerPerson = personService.findPersonByMobileNoMysql(request.getPayerMobileNo());
+			   logger.info("payer person {}",payerPerson);
+			 if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payerPerson.getStatus()))
+				 throw new Exception("user account is not active");
+			}catch(NoSuchElementException e)
+			{
+				 throw new Exception("payer user account not exist in system with mobile number "+ request.getPayerMobileNo());
+			}
 		
 		p2pContext.put(ContextConstant.PAYER_PERSON_ACCOUNT,payerPerson);
 		
 		// CHECK payeeUser EXIST OR NOT
-		Person payeePerson = personService.findPersonByMobileNoMysql(request.getPayerMobileNo());
-		
-		if(payeePerson==null)  
-			 throw new Exception("payee user account not exist in system with mobile number "+request.getPayerMobileNo());
-		else if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payeePerson.getStatus()))
+		 Person payeePerson;
+		try
+		{
+			payeePerson = personService.findPersonByMobileNoMysql(request.getPayeeMobileNo());
+		     logger.info("payee person {}",payeePerson);
+		 if(PersonStatus.UNACTIVE.name().equalsIgnoreCase(payeePerson.getStatus()))
 			 throw new Exception("user account is not active");
+		}catch(NoSuchElementException e)
+		{
+			 throw new Exception("payee user account not exist in system with mobile number "+ request.getPayeeMobileNo());
+		}
+		
+			
 		
 		p2pContext.put(ContextConstant.PAYEE_PERSON_ACCOUNT, payeePerson);
 		
 		//check user and merchant wallet is active or not
-		PersonWallet payeePersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayeeMobileNo());
-		PersonWallet payerPersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayerMobileNo());
+		PersonWallet payerPersonWallet;
+		PersonWallet payeePersonWallet;
+		try
+		{
+		   payerPersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayerMobileNo());
+		  if(AccountStatus.DISABLED.name().equalsIgnoreCase(payerPersonWallet.getStatus()))
+				 throw new Exception("payer person wallet is not active");
+		}catch(Exception e)
+		{
+			throw new Exception("payer person wallet is not exist ");
+		}
 		
-		if (AccountStatus.DISABLED.name().equalsIgnoreCase(payeePersonWallet.getStatus())) 
+		try
+		{
+		  payeePersonWallet = personWalletService.getPersonWalletFromMysql(request.getPayeeMobileNo());
+		  if (AccountStatus.DISABLED.name().equalsIgnoreCase(payeePersonWallet.getStatus())) 
 			     throw new Exception("payee User wallet is not active");
-		else if(AccountStatus.DISABLED.name().equalsIgnoreCase(payerPersonWallet.getStatus()))
-			 throw new Exception("payer User wallet is not active");
+		}
+		catch(Exception e)
+		{
+			throw new Exception("payee person wallet is not exist ");
+		}
+		
 		p2pContext.put(ContextConstant.PAYER_PERSON_WALLET, payerPersonWallet);
 		
 		//check user has sufficient amount
@@ -120,23 +152,26 @@ public class TransactionBusinessValidator {
 
     //ADD MONEY BUSINESS VALIDATION
 	public void addMoneyBusinessValidatoion(AddMoneyTransactionRequest request) throws Exception {
-		
+	try
+	{
 		PersonWallet personWallet = personWalletService.getPersonWalletFromMysql(request.getMobileNo());
-		
-		if(personWallet==null)
-			throw new Exception("wallet does not exist of this "+request.getMobileNo()+" mobile Number");
-		else if(AccountStatus.DISABLED.name().equalsIgnoreCase(personWallet.getStatus()))
+		if(AccountStatus.DISABLED.name().equalsIgnoreCase(personWallet.getStatus()))
 			throw new Exception("person wallet is not enable of "+request.getMobileNo()+" mobile Number");
-		
+	}catch(Exception e)
+	{
+			throw new Exception(" person wallet does not exist of this "+request.getMobileNo()+ " mobile Number ");			
+	}
 	}
 
-
 	public void summaryBusinessValidation(Long userId) throws Exception{
+		
+		try
+		{
 		Person person = personService.getPersonMysql(userId);
-		if(person==null) {
+		}catch(Exception e)
+		{
 			throw new Exception("user does not exist with this mobile Number");
 		}
-		
 	}		
 	
 

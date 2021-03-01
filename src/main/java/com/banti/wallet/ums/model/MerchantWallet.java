@@ -16,7 +16,7 @@ public class MerchantWallet extends BaseWallet
     
     public MerchantWallet() {} 
     
-	public MerchantWallet(String mobileNo, Double balance, Date merchantWalletcreatedDate, String status) {
+	public MerchantWallet(String mobileNo, Double balance, String status, Date merchantWalletcreatedDate) {
 		this.mobileNo = mobileNo;
 		this.balance = balance;
 		this.merchantWalletcreatedDate = merchantWalletcreatedDate;

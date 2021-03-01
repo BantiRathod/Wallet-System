@@ -85,7 +85,6 @@ public class MerchantService
 		 elasticMerchant.setRegisterDate(tempMerchant.getRegisterDate());
 		 elasticMerchant.setEmail(merchant.getEmail());
 		 elasticMerchant.setMobileNo(merchant.getMobileNo());
-	
 		 elasticMerchant.setShopName(merchant.getShopName());
 		 elasticMerchant.setStatus(PersonStatus.ACTIVE.name());
 		 elasticMerchant.setMerchantId( returnMerchant.getMerchantId());
@@ -100,21 +99,13 @@ public class MerchantService
 	 {
 		 //BUSINESS VALIDATION
 		 merchantBusinessValidator.updateMerchantvalidation(merchant, id);
-		 
-		//HERE WE WILL UPDATE ONLY THOSE FIELDS WHICH ARE UPDATABLE 
-		 ElasticMerchant elasticMerchant = new ElasticMerchant();
-		 elasticMerchant.setAddress(merchant.getAddress());
-		 elasticMerchant.setEmail(merchant.getEmail());
-		 elasticMerchant.setMobileNo(merchant.getMobileNo());
-         elasticMerchant.setMerchantId(id);
-		 elasticMerchant.setShopName(merchant.getShopName());
-		 
-		 elasticMerchantRepository.save(elasticMerchant);
-		 
-		 //Merchant tempmarchant = merchantRepository.findById(id).get();
+		
+		 Merchant tempmarchant = merchantRepository.findById(id).get();
 		 
 		 //DONT SAVE PROXY OBJECT RETREIVED FROM DATA BASE INSTEAD OF IT PUSH NEW OBJECT
 		 Merchant newMerchant=new Merchant();
+		 newMerchant.setRegisterDate(tempmarchant.getRegisterDate());
+		 newMerchant.setStatus(tempmarchant.getStatus());
 		 newMerchant.setAddress(merchant.getAddress());
 		 newMerchant.setEmail(merchant.getEmail());
 		 newMerchant.setMobileNo(merchant.getMobileNo());
@@ -122,6 +113,18 @@ public class MerchantService
 		 newMerchant.setShopName(merchant.getShopName());
 		 
 		 merchantRepository.save(newMerchant); 
+		 
+		//HERE WE WILL UPDATE ONLY THOSE FIELDS WHICH ARE UPDATABLE 
+		 ElasticMerchant elasticMerchant = new ElasticMerchant();
+		 elasticMerchant.setAddress(merchant.getAddress());
+		 elasticMerchant.setEmail(merchant.getEmail());
+		 elasticMerchant.setMobileNo(merchant.getMobileNo());
+         elasticMerchant.setMerchantId(id);
+         elasticMerchant.setRegisterDate( tempmarchant.getRegisterDate());
+         elasticMerchant.setStatus(tempmarchant.getStatus());
+		 elasticMerchant.setShopName(merchant.getShopName());
+		 
+		 elasticMerchantRepository.save(elasticMerchant);
 	 }
 
    

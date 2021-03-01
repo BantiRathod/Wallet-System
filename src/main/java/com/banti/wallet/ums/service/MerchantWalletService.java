@@ -38,7 +38,11 @@ public class MerchantWalletService implements MoneyMovementService
 		 return  elasticMerchantWalletRepository.findAll();
 	 }
 	 
-	 
+	 public MerchantWallet getMerchantWalletFromMysql(String payeeMobileNo) {
+			
+			return  merchantWalletRepository.findById(payeeMobileNo).get();
+	}
+
 	 public  ElasticMerchantWallet getMerchantWallet(String mobileNo)
 	 {
 		 
@@ -56,6 +60,7 @@ public class MerchantWalletService implements MoneyMovementService
 	 {
 		 //TO BUSINESS VALIDATION FOR CREATE Merchant Wallet 
 		 merchantWalletBusinessValidator.createMerchantWalletValidation(merchantWallet);
+		 logger.info("busuness vaidation done of merchant wallet");
 		 
 		 MerchantWallet  tempmerchantWallet = new  MerchantWallet();
 		 
@@ -63,13 +68,14 @@ public class MerchantWalletService implements MoneyMovementService
 		 tempmerchantWallet.setMerchantWalletcreatedDate(new Date());
 		 tempmerchantWallet.setMobileNo(merchantWallet.getMobileNo());
 		 tempmerchantWallet.setStatus(AccountStatus.ENABLED.name());
-		 merchantWalletRepository.save(tempmerchantWallet);
+		 MerchantWallet savedMerchantWallet = merchantWalletRepository.save(tempmerchantWallet);
+		 logger.info("saved merchant wallet {}",savedMerchantWallet );
 		 
 		 ElasticMerchantWallet  elasticMerchantWallet = new  ElasticMerchantWallet();
 		 elasticMerchantWallet.setBalance(merchantWallet.getBalance());
 		 elasticMerchantWallet.setMobileNo(merchantWallet.getMobileNo());
-		 elasticMerchantWallet.setMerchantWalletcreatedDate( tempmerchantWallet.getMerchantWalletcreatedDate());
-		 elasticMerchantWallet.setStatus(AccountStatus.ENABLED.name());
+		 elasticMerchantWallet.setMerchantWalletcreatedDate(  savedMerchantWallet.getMerchantWalletcreatedDate());
+		 elasticMerchantWallet.setStatus( savedMerchantWallet.getStatus());
 		 elasticMerchantWalletRepository.save(elasticMerchantWallet);
 		 	 
 	 }
@@ -80,12 +86,18 @@ public class MerchantWalletService implements MoneyMovementService
 		 merchantWalletBusinessValidator.updateMerchantWalletValidation(merchantWallet,mobileNo);
 		
 		 ElasticMerchantWallet elasticMerchantWallet = elasticMerchantWalletRepository.findById(mobileNo).get();
-		 elasticMerchantWallet.setMobileNo(mobileNo);
-		 elasticMerchantWalletRepository.save( elasticMerchantWallet);
 		 
-		 MerchantWallet tempMerchantWallet = merchantWalletRepository.findById(mobileNo).get();
-		 tempMerchantWallet.setMobileNo(merchantWallet.getMobileNo());
-		 merchantWalletRepository.save(tempMerchantWallet);
+		 ElasticMerchantWallet newElasticMerchantWallet = new ElasticMerchantWallet( merchantWallet.getMobileNo(),elasticMerchantWallet.getBalance(),
+				 elasticMerchantWallet.getStatus(), elasticMerchantWallet.getMerchantWalletcreatedDate());
+		
+		 elasticMerchantWalletRepository.save(newElasticMerchantWallet);
+		 
+		 MerchantWallet existMerchantWallet = merchantWalletRepository.findById(mobileNo).get();
+		 
+		 MerchantWallet newMerchantWallet = new MerchantWallet( merchantWallet.getMobileNo(),existMerchantWallet.getBalance(),
+				 existMerchantWallet.getStatus(), existMerchantWallet.getMerchantWalletcreatedDate());
+		 
+		 merchantWalletRepository.save( newMerchantWallet);
 		
 	}
 
@@ -102,7 +114,7 @@ public class MerchantWalletService implements MoneyMovementService
 		 * , WHEN WE SAVE IT THEN IT WOULD UPDATE THE PREVIOUS ONE RECORD  
 		 */
 		MerchantWallet newMerchantWallet = new MerchantWallet(merchantWallet.getMobileNo(),merchantWallet.getBalance(),
-				merchantWallet.getMerchantWalletcreatedDate(),merchantWallet.getStatus());
+				merchantWallet.getStatus(),merchantWallet.getMerchantWalletcreatedDate());
 		
 		MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(newMerchantWallet);
 		logger.info("merchant balance is {} after deducting amount{}", updatedMerchantWallet.getBalance(),amount);
@@ -117,18 +129,13 @@ public class MerchantWalletService implements MoneyMovementService
 		
 		 merchantWallet.setBalance(merchantWallet.getBalance()+amount);
 		 
+		 //CONSTRUCTOR TO INITIALIZE ALL THE FIEDS OF NEW OBJECT
 		 MerchantWallet newMerchantWallet = new MerchantWallet(merchantWallet.getMobileNo(),merchantWallet.getBalance(),
-					merchantWallet.getMerchantWalletcreatedDate(),merchantWallet.getStatus());
+				 merchantWallet.getStatus(),merchantWallet.getMerchantWalletcreatedDate());
 		 
 		 MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(newMerchantWallet);
 		 logger.info("merchant balance is {} after crediting amount {}"+ updatedMerchantWallet.getBalance());
 		return  updatedMerchantWallet;
-	}
-
-
-	public MerchantWallet getMerchantWalletFromMysql(String payeeMobileNo) {
-		
-		return  merchantWalletRepository.findById(payeeMobileNo).get();
 	}
 
 

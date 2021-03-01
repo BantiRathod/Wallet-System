@@ -20,6 +20,18 @@ public class ElasticMerchantWallet {
 	@Field(type=FieldType.Text, name="status")
     private String status;
 	
+	public ElasticMerchantWallet() {	
+	}
+	
+	public ElasticMerchantWallet(String mobileNo, Double balance,String status,Date registerDate ) {
+		this.mobileNo = mobileNo;
+		this.balance = balance;
+		this.registerDate = registerDate;
+		this.status = status;
+	}
+
+
+
 	public String getMobileNo() {
 		return mobileNo;
 	}

@@ -102,7 +102,7 @@ public class TransactionController {
 			transactionResponse.setMessage(e.getMessage());
 			transactionResponse.setDate(new Date());
 		}
-		logger.info("p2m transaction transactionResponse {}", transactionResponse);
+		logger.info("p2m transaction transactionResponse {}", transactionResponse.toString());
 		return new ResponseEntity<TransactionResponse>(transactionResponse, HttpStatus.OK);
 	}
 

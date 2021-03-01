@@ -46,6 +46,7 @@ public class KafkaTransactionConsumer {
     		elasticWalletTransaction.setTransactionType(tempTransaction.getTransactionType());
     		//TO STORE TRANSACTION IN ELASTICSEARCH DATABASE
     		transactionService.saveElasticTransaction(elasticWalletTransaction);
+    		logger.info("saved {}",elasticWalletTransaction);
         
          }
 }

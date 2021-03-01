@@ -19,6 +19,16 @@ public class ElasticPersonWallet {
 	private String status;
     @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ", name="createdDate")
 	private Date createdDate;
+    
+	
+    public ElasticPersonWallet() {}
+	public ElasticPersonWallet(String mobileNo, Double balance, String status, Date createdDate) {
+
+		this.mobileNo = mobileNo;
+		this.balance = balance;
+		this.status = status;
+		this.createdDate = createdDate;
+	}
 	public String getMobileNo() {
 		return mobileNo;
 	}

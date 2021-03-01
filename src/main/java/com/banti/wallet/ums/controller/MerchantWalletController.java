@@ -65,16 +65,17 @@ public class MerchantWalletController
 	@PostMapping("/merchantWallet")
 	public ResponseEntity<String> createWallet(@RequestBody MerchantWalletRequest merchantWallet)
       {
-		logger.info("merchantWallet received {} ", merchantWallet);
+		logger.info(" received {} ", merchantWallet);
 		try
 		{
 		   // TO VALIDED MOBILE NUMBER {ID IS MOBILE NUMBER THEREFORE, WE CAN USE ABOVE CALLED VALIDATION METHOD}
 		   merchantWalletRequestBodyValidator. merchantWalletIdValidatoion(merchantWallet.getMobileNo());
-		   
+		   logger.info("request body validation done");
 		   merchantWalletService.createMerchantWallet(merchantWallet);
 		   return new ResponseEntity<String>("New merchant wallet of "+merchantWallet.getMobileNo()+"has heen created",HttpStatus.OK);
         }catch(Exception e)
 		{
+        	logger.error("Exception occured, "+e.getMessage());
         	return new ResponseEntity<String>("Exception occured, "+e.getMessage(),HttpStatus.OK);
 		}
 	 }

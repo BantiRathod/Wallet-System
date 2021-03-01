@@ -3,6 +3,7 @@ package com.banti.wallet.ums.requestEntities;
 public class MerchantWalletRequest {
 	private String mobileNo;
 	private Double balance;
+	
 	public String getMobileNo() {
 		return mobileNo;
 	}

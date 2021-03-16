@@ -283,5 +283,10 @@ public class TransactionService
 		return walletTransaction;
 		
 	}
+
+	public List<WalletTransaction> getMerchantTransactionBetweenTime(String mobileNo, Date startDate, Date endDate) {
+		
+		return transactionrepository.getMerchantTransaction(mobileNo, startDate, endDate);
+	}
 	
 }

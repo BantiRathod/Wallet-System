@@ -17,19 +17,22 @@ import com.banti.wallet.ums.validator.request.PersonRequestBodyValidator;
 import java.util.NoSuchElementException;
 
 
-//TO WORK AT SERVER SIDE AND REMOVE VIEW PART Restcontroller USED 
+//To HANDLE ALL REQUEST RELATED TO PERSON, PERSONCONTROLLER CLASS CREATED
+// MARKED AS RESTCONTROLLER
 @RestController                                                                   
 public class PersonController 
-{
+{       
+	// LOGGER IS USED TO PRINT THE VALUE OF VARIABLE LIKE SYSTEM.OUT.PRINTLN METHOD, BUT IT ALSO PRINT DATE, TIME , CLASS WITH PACKAGE THAT HELPS IN TRACING. 
 	Logger logger=LoggerFactory.getLogger(PersonController.class);
 	
+	//TO INJECT(PUSH HERE) OBJECT OF A CLASS(FROM APPLICATION CONTEXT{IOC CONTAINER), AUTOWIRED IS USED.
 	@Autowired
 	private PersonRequestBodyValidator personRequestBodyValidator;
-	//TO INJECT(PUSH HERE) PERSONSERVICE CLASS OBJECT( FROM APPLICATION CONTEXT{IOC CONTAINER})
 	@Autowired                                                                     
 	private PersonService personService;                                             
 
-   
+         // TO MAP URL WITH METHOD(RESPONSIBLE FOR SERVE THE USER REQUEST), GETMAPPING ANNO. IS USED. 
+	 // THIS IS A API WHICH WILL RETREIVE ALL PERSON RECORDS FROM DATABASE.
 	 @GetMapping("/persons")
 	 public ResponseEntity<Iterable<ElasticPerson>> fatchAllPerson() {
 	     try {
@@ -47,6 +50,7 @@ public class PersonController
 	     }
 	 }
 	
+	  // THIS IS A API WHICH WILL RETREIVE A PERSON RECORDS FROM DATABASE.
 	 @GetMapping("/person/{id}")
 	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {
 	     try {
@@ -67,7 +71,7 @@ public class PersonController
 	     }
 	 }
 	
-	 
+	 // THIS METHOD WILL REGISTER THE PERSON.
 	 @PostMapping("/Sign-Up")
 	 public ResponseEntity<String> registerPerson(@RequestBody PersonRequestEntity user) {
 		 logger.info("PersonRequestEntity received from user {}",user);
@@ -86,12 +90,12 @@ public class PersonController
 	 }
 	 
 	 
-	// RESTful API for Update Operation
+	// TO UPDATE CERTAIN PERSON RECORD USING ID.
 	 @PutMapping("/person/{id}")
 	 public ResponseEntity<String> toUpdatePersonDetail(@RequestBody UpdatePersonRequest person,@PathVariable Long id) {
 	     try
 	     {   
-	    	 //TO CHECK PASSED PARAMETERS ARE VALID OR NOT
+	    	 //TO CHECK WETHER PASSED PARAMETERS ARE VALID OR NOT
 	    	 personRequestBodyValidator.personRequestBodyAndIdValidation(person,id);
 	    	 
 	    	 logger.info("person received as a request body {}",person);
@@ -103,7 +107,7 @@ public class PersonController
 	     }      
 	 } 
 	
-	// RESTful API for Delete Operation
+	// TO DELETE CERTAIN PERSON RECORD USING ID.
 	 @DeleteMapping("/person/{id}")
 	 public ResponseEntity<Person> deletePersonUsingId(@PathVariable Long id)
 	 {

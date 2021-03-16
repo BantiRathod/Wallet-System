@@ -1,6 +1,8 @@
 package com.banti.wallet.ums.service;
 
 import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,27 +27,21 @@ public class MerchantWalletService implements MoneyMovementService
 	
 	 @Autowired
 	 private ElasticMerchantWalletRepository  elasticMerchantWalletRepository;
-	 
 	 @Autowired
 	 private MerchantWalletRepository merchantWalletRepository;
-	 
 	 @Autowired
 	 private MerchantWalletBusinessValidator merchantWalletBusinessValidator;
 	 
 	 
-	 public Iterable<ElasticMerchantWallet> getListOfAllMerchantWallet()
-	 {
+	 public Iterable<ElasticMerchantWallet> getListOfAllMerchantWallet(){
 		 return  elasticMerchantWalletRepository.findAll();
 	 }
 	 
-	 public MerchantWallet getMerchantWalletFromMysql(String payeeMobileNo) {
-			
+	 public MerchantWallet getMerchantWalletFromMysql(String payeeMobileNo) {		
 			return  merchantWalletRepository.findById(payeeMobileNo).get();
-	}
+	 }
 
-	 public  ElasticMerchantWallet getMerchantWallet(String mobileNo)
-	 {
-		 
+	 public  ElasticMerchantWallet getMerchantWallet(String mobileNo) {
 	    return   elasticMerchantWalletRepository.findById(mobileNo).get();
 	 }
 	
@@ -136,6 +132,10 @@ public class MerchantWalletService implements MoneyMovementService
 		 MerchantWallet updatedMerchantWallet=merchantWalletRepository.save(newMerchantWallet);
 		 logger.info("merchant balance is {} after crediting amount {}"+ updatedMerchantWallet.getBalance());
 		return  updatedMerchantWallet;
+	}
+
+	public List<MerchantWallet> getEnabledMerchantWalletListMysql() {
+		return merchantWalletRepository.getEnabledMerchantWalletList();
 	}
 
 

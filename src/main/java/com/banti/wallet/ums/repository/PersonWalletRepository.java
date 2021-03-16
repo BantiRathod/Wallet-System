@@ -6,6 +6,5 @@ import com.banti.wallet.ums.model.PersonWallet;
 
 public interface PersonWalletRepository extends JpaRepository<PersonWallet,String> {
 
-
 }
 		

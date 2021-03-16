@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.banti.wallet.ums.elasticsearch.repositories.ElasticPayoutRepository;
-import com.banti.wallet.ums.enums.PayloadStatus;
+import com.banti.wallet.ums.enums.PayoutStatus;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.model.WalletTransaction;
 import com.banti.wallet.ums.repository.PayoutRepository;
@@ -45,47 +45,53 @@ public class PayoutService {
 	  }
 	  
 //@Scheduled(fixedRate = 2*60*1000)
-@Scheduled( cron = "* 1 * * * ?")                  // specified time at which trigger has to fire
+@Scheduled(cron = "0 */1 * ? * *")                  // specified time at which trigger has to fire
 public void payoutOfMerchants() throws Exception
  {  	
-	List<MerchantWallet> merchantWalletList = merchantWalletService.getEnabledMerchantWalletListMysql();	  
-		
+	List<MerchantWallet> merchantWalletList = merchantWalletService.getEnabledMerchantWalletListMysql();	
+	
+	logger.info("Extracted Enabled merchant wallet {} ",merchantWalletList);
+	
+	 Calendar cal1 = Calendar.getInstance();
+     cal1.set(Calendar.HOUR_OF_DAY,00);
+     cal1.set(Calendar.MINUTE,00);
+     cal1.set(Calendar.SECOND,0);
+     cal1.set(Calendar.MILLISECOND,00);
+     
+     Calendar cal2 = Calendar.getInstance();
+     cal2.set(Calendar.HOUR_OF_DAY,23);
+     cal2.set(Calendar.MINUTE,59);
+     cal2.set(Calendar.SECOND,59);
+     cal2.set(Calendar.MILLISECOND,999);
+
+     Date startDate = cal1.getTime();
+     Date endDate   = cal2.getTime();
+     
 for(MerchantWallet merchantWallet : merchantWalletList )
  {
-	    Calendar cal1 = Calendar.getInstance();
-         cal1.set(Calendar.HOUR_OF_DAY,00);
-         cal1.set(Calendar.MINUTE,00);
-         cal1.set(Calendar.SECOND,0);
-         cal1.set(Calendar.MILLISECOND,00);
-         
-         Calendar cal2 = Calendar.getInstance();
-         cal2.set(Calendar.HOUR_OF_DAY,11);
-         cal2.set(Calendar.MINUTE,59);
-         cal2.set(Calendar.SECOND,59);
-         cal2.set(Calendar.MILLISECOND,999);
-
-         Date startDate = cal1.getTime();
-         Date endDate   = cal2.getTime();
-	 List<WalletTransaction> merchantTransactionList = transactionService.getMerchantTransactionBetweenTime(merchantWallet.getMobileNo(),startDate,endDate); 
-	
+	   
+	     List<WalletTransaction> merchantTransactionList = transactionService.getMerchantTransactionBetweenTime(merchantWallet.getMobileNo(),startDate,endDate); 
+	     
+	     logger.info("Extracted merchantTransaction {} ",merchantTransactionList);
 	 //ENSURE THAT AT LEAT ONE MERCHANT TRANSACTION SHOULD EXIST 
-	 if(merchantTransactionList.isEmpty())
-		      continue;
+	    if(merchantTransactionList.isEmpty())
+		           continue;
 	
-	 double totalAmount = 0.0;
-	 String merchantMobileNo = merchantWallet.getMobileNo();
+	   double totalAmount = 0.0;
+	   String merchantMobileNo = merchantWallet.getMobileNo();
 	 
-	 for(WalletTransaction merchantTransaction :merchantTransactionList)
+	   for(WalletTransaction merchantTransaction :merchantTransactionList)
 	     	totalAmount+=merchantTransaction.getAmount();
 	 
-		Payout payout= new Payout();
+	  logger.info("total amount received {} of {} nuber ", Double.toString(totalAmount),merchantMobileNo);
+		 Payout payout= new Payout();
 		
-		payout.setMerchantMobileNo(merchantMobileNo);
-		payout.setSendMoneyDate(new Date());
-        payout.setStatus(PayloadStatus.SATTELED.name());
-        payout.setAmount(totalAmount);
+		 payout.setMerchantMobileNo(merchantMobileNo);
+		 payout.setSendMoneyDate(new Date());
+         payout.setStatus(PayoutStatus.SATTELED.name());
+         payout.setAmount(totalAmount);
   
-        Payout savedPayout = payoutRepository.save(payout); 
+         Payout savedPayout = payoutRepository.save(payout); 
         logger.info("saved {}",savedPayout);
        
      //SAVE DATA IN ELASTIC SEARCH DATA BASE
@@ -93,7 +99,7 @@ for(MerchantWallet merchantWallet : merchantWalletList )
        elasticPayout.setAmount(totalAmount);
        elasticPayout.setMerchantMobileNo(merchantMobileNo);
        elasticPayout.setSendMoneyDate(new Date());
-       elasticPayout.setStatus(PayloadStatus.SATTELED.name());
+       elasticPayout.setStatus(PayoutStatus.SATTELED.name());
        elasticPayout.setPayloadId(savedPayout.getPayloadId());
        elasticPayoutRepository.save(elasticPayout); 
 	}

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.banti.wallet.ums.elasticsearch.models.ElasticPerson;
 import com.banti.wallet.ums.model.Person;
 import com.banti.wallet.ums.requestEntities.PersonRequestEntity;
@@ -17,19 +16,28 @@ import com.banti.wallet.ums.validator.request.PersonRequestBodyValidator;
 import java.util.NoSuchElementException;
 
 
-//TO WORK AT SERVER SIDE AND REMOVE VIEW PART Restcontroller USED 
+//Controller class, TO HANDLE ALL REQUESTS RELATED TO PERSON RECORDS, MARKED WITH RESTCONTROLLER.
 @RestController                                                                   
 public class PersonController 
 {
 	Logger logger=LoggerFactory.getLogger(PersonController.class);
 	
+	//TO INJECT(PUSH HERE)OBJECT OF A CLASS(FROM APPLICATION CONTEXT{IOC CONTAINER})
 	@Autowired
 	private PersonRequestBodyValidator personRequestBodyValidator;
-	//TO INJECT(PUSH HERE) PERSONSERVICE CLASS OBJECT( FROM APPLICATION CONTEXT{IOC CONTAINER})
 	@Autowired                                                                     
 	private PersonService personService;                                             
 
    
+	
+	 /**
+	  * THIS API IS REPONSIBLE FOR RETREIVING ALL REGISTERED PERSON RECORDS.
+	  * 
+	  * HERE, METHOD OF PERSON SERVICE LAYER WOULD BE INVOKED IN ORDER TO GET PERSON RECORDS....
+	  * AND PERSON RECORDS WOULD BE RETRIEVED FROM ELASTICSEARCH DATA BASE INSTEAD OF MYSQL.  
+	  * 
+	  * IF RECORDS NOT EXIST THEN RETURN HTTPSTATUS "NOT_FOUND".   
+	  */
 	 @GetMapping("/persons")
 	 public ResponseEntity<Iterable<ElasticPerson>> fatchAllPerson() {
 	     try {
@@ -47,6 +55,16 @@ public class PersonController
 	     }
 	 }
 	
+	 
+	 /**
+	  * THIS API IS REPONSIBLE FOR RETRIEVING A PERSON RECORD.
+	  * 
+	  * @param id IS A PARAMETER, WOULD BE PASSED WITH MAKING REQUEST BY USER.
+	  * BY REQUESTBODYVALIDATOR CLASS, PASSED PARAMETER WOULD BE VARIFY, IF OK THEN PROCESS FURTHER...( CONTINUE STATEMENT WITH NEW LINE)
+	  * WOULD CALL SERVICE LAYER METHOD.
+	  * 
+	  * @return PERSON RECORD WOULD BE RETURN IF EXIST, ONTHERWISE AN EXCEPTION WOULD BE THROWN AND RETURN HTTPSTATUS CODE "NOT_FOUND". 
+	  */ 
 	 @GetMapping("/person/{id}")
 	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {
 	     try {
@@ -68,6 +86,18 @@ public class PersonController
 	 }
 	
 	 
+	 /**
+	  * THIS API IS REPONSIBLE FOR, TO DONE USER REGISTRATION.
+	  * 
+	  * PostMapping ANNOTATION MAKE THE SPECIFIED URL WITH METHOD.
+	  * 
+	  * @param user PARAMETER TYPE OF PersonRequestEntity WPOULD BE PASSED WHILE MAKING URL REQUEST BY USER.
+	  * 
+	  * USER PARAMETER WOULD BE VALIDAED BY personRequestBodyValidator CLASS,IF PASSED VALUES ARE RIGHT...
+	  * THEN INVOKE METHOD OF SERVICE LAYER FOR SAVING USER DETAILS, OTHERWISE THROW AN EXCEPTION.
+	  * 
+	  * @return A MESSAGE WOULD BE RETURN AFTER SUCCESSFUL REGISTRATION, OTHERWISE A EXCEPTION MESSAGE RETURN. 
+	  */
 	 @PostMapping("/Sign-Up")
 	 public ResponseEntity<String> registerPerson(@RequestBody PersonRequestEntity user) {
 		 logger.info("PersonRequestEntity received from user {}",user);
@@ -86,7 +116,17 @@ public class PersonController
 	 }
 	 
 	 
-	// RESTful API for Update Operation
+	/**
+	 * THIS API IS REPONSIBLE FOR UPDATING EXIST PERSON RECORD.
+	 * 
+	 * 
+	 * @param person TYPE OF UpdatePersonRequest AND id WPOULD BE PASSED WHILE MAKING URL REQUEST BY USER.
+	 * 
+	 * personRequestBodyValidator CLASS WOULD VALIDET THE PASSED PARAMETER,IF PASSED VALUES ARE RIGHT...
+	 * THEN INVOKE METHOD OF SERVICE LAYER FOR UPDATING USER DETAILS, OTHERWISE THROW AN EXCEPTION.
+	 * 
+	 * @return STRING WOULD BE RETURN AFTER SUCCESSFUL DELETION OR EXCEPTION MESSAGE. 
+	 */
 	 @PutMapping("/person/{id}")
 	 public ResponseEntity<String> toUpdatePersonDetail(@RequestBody UpdatePersonRequest person,@PathVariable Long id) {
 	     try
@@ -103,7 +143,20 @@ public class PersonController
 	     }      
 	 } 
 	
-	// RESTful API for Delete Operation
+	 
+
+     /**
+      * THIS API IS REPONSIBLE FOR, DELETING EXIST USER RECORD.
+	  * 
+	  * DeleteMapping ANNOTATION MAP THE SPECIFIED URL WITH METHOD.
+	  * 
+	  * @param ID WPOULD BE PASSED WHILE MAKING URL REQUEST BY USER.
+	  * 
+	  * id PARAMETER WOULD BE VALIDAED BY personRequestBodyValidator CLASS,IF PASSED VALUE is RIGHT...
+	  * THEN INVOKE METHOD OF SERVICE LAYER FOR deleting PERSON DETAILS, OTHERWISE THROW AN EXCEPTION PERSON NOT EXIST.
+	  * 
+	  * @return A DELETED PERSON WOULD BE RETURN AFTER SUCCESSFUL DELETION, OTHERWISE RETURN A HTTTPSTATUS NOT FOUND.
+      */
 	 @DeleteMapping("/person/{id}")
 	 public ResponseEntity<Person> deletePersonUsingId(@PathVariable Long id)
 	 {

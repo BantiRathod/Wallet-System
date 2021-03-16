@@ -6,4 +6,4 @@ import com.banti.wallet.ums.scheduling.Payout;
 
 public interface PayoutRepository extends JpaRepository<Payout,Long>{
    
-	 }
+}

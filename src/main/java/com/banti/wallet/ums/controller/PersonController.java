@@ -18,19 +18,18 @@ import java.util.NoSuchElementException;
 
 //Controller class, TO HANDLE ALL REQUESTS RELATED TO PERSON RECORDS, MARKED WITH RESTCONTROLLER.
 //To HANDLE ALL REQUEST RELATED TO PERSON, PERSONCONTROLLER CLASS CREATED
-// MARKED AS RESTCONTROLLER
 @RestController                                                                   
 public class PersonController 
 {       
 	// LOGGER IS USED TO PRINT THE VALUE OF VARIABLE LIKE SYSTEM.OUT.PRINTLN METHOD, BUT IT ALSO PRINT DATE, TIME , CLASS WITH PACKAGE THAT HELPS IN TRACING. 
 	Logger logger=LoggerFactory.getLogger(PersonController.class);
 	
-	//TO INJECT(PUSH HERE)OBJECT OF A CLASS(FROM APPLICATION CONTEXT{IOC CONTAINER})
 	//TO INJECT(PUSH HERE) OBJECT OF A CLASS(FROM APPLICATION CONTEXT{IOC CONTAINER), AUTOWIRED IS USED.
 	@Autowired
 	private PersonRequestBodyValidator personRequestBodyValidator;
 	@Autowired                                                                     
-	private PersonService personService;                                             	
+	private PersonService personService;  
+	
 	 /**
 	  * THIS API IS REPONSIBLE FOR RETREIVING ALL REGISTERED PERSON RECORDS.
 	  * 
@@ -39,8 +38,6 @@ public class PersonController
 	  * 
 	  * IF RECORDS NOT EXIST THEN RETURN HTTPSTATUS "NOT_FOUND".   
 	  */
-         // TO MAP URL WITH METHOD(RESPONSIBLE FOR SERVE THE USER REQUEST), GETMAPPING ANNO. IS USED. 
-	 // THIS IS A API WHICH WILL RETREIVE ALL PERSON RECORDS FROM DATABASE.
 	 @GetMapping("/persons")
 	 public ResponseEntity<Iterable<ElasticPerson>> fatchAllPerson() {
 	     try {
@@ -68,7 +65,6 @@ public class PersonController
 	  * 
 	  * @return PERSON RECORD WOULD BE RETURN IF EXIST, ONTHERWISE AN EXCEPTION WOULD BE THROWN AND RETURN HTTPSTATUS CODE "NOT_FOUND". 
 	  */ 
-	  // THIS IS A API WHICH WILL RETREIVE A PERSON RECORDS FROM DATABASE.
 	 @GetMapping("/person/{id}")
 	 public ResponseEntity<ElasticPerson> get(@PathVariable Long id) {
 	     try {
@@ -102,7 +98,6 @@ public class PersonController
 	  * 
 	  * @return A MESSAGE WOULD BE RETURN AFTER SUCCESSFUL REGISTRATION, OTHERWISE A EXCEPTION MESSAGE RETURN. 
 	  */
-	 // THIS METHOD WILL REGISTER THE PERSON.
 	 @PostMapping("/Sign-Up")
 	 public ResponseEntity<String> registerPerson(@RequestBody PersonRequestEntity user) {
 		 logger.info("PersonRequestEntity received from user {}",user);

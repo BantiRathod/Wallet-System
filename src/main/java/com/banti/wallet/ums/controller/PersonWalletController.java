@@ -119,7 +119,7 @@ public class PersonWalletController {
 	/**
      * THIS API IS REPONSIBLE FOR UPDATING A PERSON WALLET OF REGISTERED PERSON.
 	 *  
-	 * @param personWallet AND mobileNo ARE PARAMETERS TYPE OF UpdatePersonWalletRequest AND String RESPECTIVLY PASSED WHILE MAKING REQUEST BY USER.
+	 * @param personWallet AND mobileNo ARE PARAMETERS TYPE OF RESPECTIVLY UpdatePersonWalletRequest AND String PASSED WHILE MAKING REQUEST BY USER.
 	 * FIELDS OR VARIABLES OF UpdatePersonWalletRequest{ mobileNo }
 	 * 
 	 * personWalletMobileNoValidation METHOD WILL VALIDATE PASSED personWallet and string IF THEY ARE VALID THEN INVOKE METHOD OF...

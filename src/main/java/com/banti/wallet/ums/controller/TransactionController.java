@@ -38,14 +38,22 @@ public class TransactionController {
 
 	@Autowired
 	private TransactionService transactionService;
-
-	/*
-	 * @Autowired private PaginationRequestValidator paginationRequestValidator;
-	 */
+	//@Autowired private PaginationRequestValidator paginationRequestValidator;
+	 
 	@Autowired 
 	private PersonService personService;
 	 
-
+    /**
+     * THIS API IS RESPOMSIBLE FOR GETTING ALL TRANSACTIONS OF PASSED USER ID.
+     * 
+     * @param userId IS A PARAMETER PASSED BY USER WHILE MAKING HTTP GET REQUEST FOR TRNASCTIONS.
+     * @PathVariable => IT IS A ANNOTATION WHICH BINDS THE PASSED PARAMETER WITH METHOD'S LOCAL VARIBLE.
+     * 
+     * getListOfAllTransaction IS METHOD OF SERVICE LAYER CLASS WHICH IS REPONSIBLE FOR RETRIEVING RECORDS, IF GIVEN USER ID IS EXIST..
+     * OTHER WISE THROW EXCEPTION.  
+     *     
+     * @return LIST OF TRANSACTIONS OR EXCEPTION MESSSAGE. 
+     */
 	@GetMapping("/transactionSummary")
 	public ResponseEntity<Iterable<ElasticWalletTransaction>> getTransactionSummary(@PathVariable Long userId ) {
 		logger.info("paginationRequest received {}", userId);
@@ -67,6 +75,17 @@ public class TransactionController {
 		}
 	}
 
+	 /**
+     * THIS API IS RESPOMSIBLE FOR GETTING STATUS OF TRANSACTION USING ID.
+     * 
+     * @param Id IS A PARAMETER PASSED BY USER WHILE MAKING HTTP GET REQUEST FOR TRNASCTION STATUS.
+     * @PathVariable => IT IS A ANNOTATION WHICH BINDS THE PASSED PARAMETER WITH METHOD'S LOCAL VARIBLE.
+     * 
+     * getStatus IS METHOD OF SERVICE LAYER CLASS WHICH IS REPONSIBLE FOR RETRIEVING RECORDS, IF GIVEN ID IS EXIST..
+     * OTHER WISE THROW EXCEPTION.  
+     *     
+     * @return STATUS OF TRANSACTION OR EXCEPTION MESSSAGE. 
+     */
 	@GetMapping("/transactionStatus/{id}")
 	public ResponseEntity<String> getTransactionStatus(@PathVariable Long id) {
 		try {
@@ -77,7 +96,24 @@ public class TransactionController {
 		}
 	}
 
-	// API FOR SENDING MONEY TO A MERCHANT
+	
+	 /**
+     * THIS API IS RESPOMSIBLE FOR MAKING P2M TRANSACTION.
+     * 
+     * @param request IS A OBJECT OF TransactionRequest WHICH WILL CONTAIN PARAMETERS PASSED BY USER AS A SINGLE BODY..
+     * WHILE MAKING HTTP POST REQUEST FOR P2M TRNASCTION.
+     * 
+     * @RequestBody => IT IS A ANNOTATION WHICH BINDS THE PASSED BODY WITH METHOD'S LOCAL OBJECT.
+     * 
+     * PASSED REQUEST BODY parameters{ amount, payerMobileNo, payeeMobileNo}
+     * 
+     * p2mRequestValidator IS METHOD FOR CHECKING THAT WEATHER PASSED BODY'S PARAMETERS ARE VALID OR NOT, IF YES THEN 
+     * SERVICE LAYER'S METHOD WOULD INVOKED FOR FURTHER PROCESS OTHER WISE THROW AN EXCEPTION.
+     *  
+     *generateP2MResponse IS METHOD INVOKED WHEN TRANSACTION HAPPENED SUCCEDDFULLY THEN WE HAVE TO GENERATE TRANSACTION OBJECT INORDER TO STORE IT IN DATABASE.  
+     *     
+     * @return TRANSACTION RESPONSE OBJECT. 
+     */
 	@PostMapping("/transaction/P2M")
 	public ResponseEntity<TransactionResponse> payMoneyToMerchant(@RequestBody TransactionRequest request) {
 		
@@ -121,7 +157,23 @@ public class TransactionController {
 		transactionResponse.setOrderId(request.getOrderId());
 	}
 
-	// API FOR SENDING MONEY TO A PERSON
+	 /**
+     * THIS API IS RESPOMSIBLE FOR MAKING P2P TRANSACTION.
+     * 
+     * @param request IS A OBJECT OF TransactionRequest WHICH WILL CONTAIN PARAMETERS PASSED BY USER AS A SINGLE BODY..
+     * WHILE MAKING HTTP POST REQUEST FOR P2M TRNASCTION.
+     * 
+     * @RequestBody => IT IS A ANNOTATION WHICH BINDS THE PASSED BODY WITH METHOD'S LOCAL OBJECT.
+     * 
+     * PASSED REQUEST BODY parameters{ amount, payerMobileNo, payeeMobileNo}
+     * 
+     * p2pRequestValidator IS METHOD FOR CHECKING THAT WEATHER PASSED BODY'S PARAMETERS ARE VALID OR NOT, IF YES THEN 
+     * SERVICE LAYER'S METHOD WOULD INVOKED FOR FURTHER PROCESS OTHER WISE THROW AN EXCEPTION.
+     *  
+     *generateP2PResponse IS METHOD INVOKED WHEN TRANSACTION HAPPENED SUCCEDDFULLY THEN WE HAVE TO GENERATE TRANSACTION OBJECT INORDER TO STORE IT IN DATABASE.  
+     *     
+     * @return TRANSACTION RESPONSE OBJECT. 
+     */
 	@PostMapping("/transaction/P2P")
 	public ResponseEntity<TransactionResponse> payMoneyToPersion(@RequestBody TransactionRequest request) {
 		
@@ -167,7 +219,23 @@ public class TransactionController {
 	}
 
 	
-	  //ADD M0NEY API  
+	 /**
+     * THIS API IS RESPOMSIBLE FOR MAKING ADDMONEY TRANSACTION.
+     * 
+     * @param request IS A OBJECT OF AddMoneyTransactionRequest WHICH WILL CONTAIN PARAMETERS PASSED BY USER AS A SINGLE BODY..
+     * WHILE MAKING HTTP POST REQUEST FOR P2M TRNASCTION.
+     * 
+     * PASSED REQUEST BODY parameters{ amount, mobileNo}
+     * 
+     * @RequestBody => IT IS A ANNOTATION WHICH BINDS THE PASSED BODY WITH METHOD'S LOCAL OBJECT.
+     * 
+     * addMoneyRequestValidator IS METHOD FOR CHECKING THAT WEATHER PASSED BODY'S PARAMETERS ARE VALID OR NOT, IF YES THEN 
+     * SERVICE LAYER'S METHOD WOULD INVOKED FOR FURTHER PROCESS OTHER WISE THROW AN EXCEPTION.
+     *  
+     *generateAddMoneyResponse IS METHOD INVOKED WHEN TRANSACTION HAPPENED SUCCEDDFULLY THEN WE HAVE TO GENERATE TRANSACTION OBJECT INORDER TO STORE IT IN DATABASE.  
+     *     
+     * @return TRANSACTION RESPONSE OBJECT. 
+     */
 	  @PostMapping("/transaction/addMoney") 
 	  public ResponseEntity<TransactionResponse> addMoney(@RequestBody AddMoneyTransactionRequest request) 
 	  { 

@@ -6,10 +6,9 @@ public class UpdatePersonRequest {
 	private String userName;
 	private String firstName;
 	private String lastName;
-	private String address;
-	private String email;
-    private String mobileNo; 
+	private String address; 
 	private String password;
+	
 	public String getUserName() {
 		return userName;
 	}
@@ -34,18 +33,7 @@ public class UpdatePersonRequest {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getMobileNo() {
-		return mobileNo;
-	}
-	public void setMobileNo(String mobileNo) {
-		this.mobileNo = mobileNo;
-	}
+
 	public String getPassword() {
 		return password;
 	}
@@ -56,7 +44,7 @@ public class UpdatePersonRequest {
 	@Override
 	public String toString() {
 		return "UpdatePersonRequest [userName=" + userName + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", address=" + address + ", email=" + email + ", mobileNo=" + mobileNo + ", password=" + password
+				+ ", address=" + address + ", password=" + password
 				+ "]";
 	}
 	

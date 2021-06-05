@@ -45,7 +45,7 @@ public class PayoutService {
 	  }
 	  
 //@Scheduled(fixedRate = 2*60*1000)
-@Scheduled(cron = "0 */1 * ? * *")                  // specified time at which trigger has to fire
+@Scheduled(cron = "0 */5 * ? * *")                  // specified time at which trigger has to fire.
 public void payoutOfMerchants() throws Exception
  {  	
 	List<MerchantWallet> merchantWalletList = merchantWalletService.getEnabledMerchantWalletListMysql();	

@@ -5,21 +5,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banti.wallet.ums.elasticsearch.models.ElasticMerchantWallet;
 import com.banti.wallet.ums.requestEntities.MerchantWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
+//import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
 import com.banti.wallet.ums.service.MerchantWalletService;
 import com.banti.wallet.ums.validator.request.MerchantWalletRequestBodyValidator;
 
 @RestController
+@CrossOrigin(origins={ "http://localhost:3000", "http://localhost" })
 public class MerchantWalletController 
 {
 	Logger logger=LoggerFactory.getLogger(MerchantController.class);
@@ -81,20 +83,23 @@ public class MerchantWalletController
 	 }
 	
 	
-	@PutMapping("/merchantWallet/{mobileNo}")
-	public ResponseEntity<String> toUpdateMerchantallet(@PathVariable String mobileNo, @RequestBody UpdateMerchantWalletRequest updateMerchantWalletRequest)
-	{
-		logger.info("UpdateMerchantWalletRequest received {} ",updateMerchantWalletRequest);
-		try
-		{	//TO VALIDATE NEW MOBILE NUMBER AND EXIST NUMBER
-			merchantWalletRequestBodyValidator.updateMerchantWalletValidation(mobileNo,updateMerchantWalletRequest);
-			
-			merchantWalletService.updateMerchantWallet(updateMerchantWalletRequest, mobileNo);
-		    return new ResponseEntity<String>("merchant wallet of "+mobileNo+"has heen updated successfully",HttpStatus.OK);
-		}catch(Exception e){
-			return new ResponseEntity<String>("Exception occured, "+e.getMessage(),HttpStatus.OK);
-		}	
-    }
+		/*
+		 * @PutMapping("/merchantWallet/{mobileNo}") public ResponseEntity<String>
+		 * toUpdateMerchantallet(@PathVariable String mobileNo, @RequestBody
+		 * UpdateMerchantWalletRequest updateMerchantWalletRequest) {
+		 * logger.info("UpdateMerchantWalletRequest received {} "
+		 * ,updateMerchantWalletRequest); try { //TO VALIDATE NEW MOBILE NUMBER AND
+		 * EXIST NUMBER
+		 * merchantWalletRequestBodyValidator.updateMerchantWalletValidation(mobileNo,
+		 * updateMerchantWalletRequest);
+		 * 
+		 * merchantWalletService.updateMerchantWallet(updateMerchantWalletRequest,
+		 * mobileNo); return new ResponseEntity<String>("merchant wallet of "
+		 * +mobileNo+"has heen updated successfully",HttpStatus.OK); }catch(Exception
+		 * e){ return new
+		 * ResponseEntity<String>("Exception occured, "+e.getMessage(),HttpStatus.OK); }
+		 * }
+		 */
 	
 	
 	@DeleteMapping("/merchantWallet/{mobileNo}")

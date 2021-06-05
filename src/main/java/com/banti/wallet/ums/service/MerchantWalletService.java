@@ -16,7 +16,7 @@ import com.banti.wallet.ums.model.BaseWallet;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.repository.MerchantWalletRepository;
 import com.banti.wallet.ums.requestEntities.MerchantWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
+//import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
 import com.banti.wallet.ums.validator.business.MerchantWalletBusinessValidator;
 
 @Service (value="merchantWalletService")
@@ -76,26 +76,7 @@ public class MerchantWalletService implements MoneyMovementService
 		 	 
 	 }
 
-	public void updateMerchantWallet(UpdateMerchantWalletRequest merchantWallet, String mobileNo) throws Exception 
-	{
-		//FOR BUSINESS VALIADATION
-		 merchantWalletBusinessValidator.updateMerchantWalletValidation(merchantWallet,mobileNo);
-		
-		 ElasticMerchantWallet elasticMerchantWallet = elasticMerchantWalletRepository.findById(mobileNo).get();
-		 
-		 ElasticMerchantWallet newElasticMerchantWallet = new ElasticMerchantWallet( merchantWallet.getMobileNo(),elasticMerchantWallet.getBalance(),
-				 elasticMerchantWallet.getStatus(), elasticMerchantWallet.getMerchantWalletcreatedDate());
-		
-		 elasticMerchantWalletRepository.save(newElasticMerchantWallet);
-		 
-		 MerchantWallet existMerchantWallet = merchantWalletRepository.findById(mobileNo).get();
-		 
-		 MerchantWallet newMerchantWallet = new MerchantWallet( merchantWallet.getMobileNo(),existMerchantWallet.getBalance(),
-				 existMerchantWallet.getStatus(), existMerchantWallet.getMerchantWalletcreatedDate());
-		 
-		 merchantWalletRepository.save( newMerchantWallet);
-		
-	}
+	
 
 	
 	@Override
@@ -140,3 +121,32 @@ public class MerchantWalletService implements MoneyMovementService
 
 
 }
+
+/*
+ * public void updateMerchantWallet(UpdateMerchantWalletRequest merchantWallet,
+ * String mobileNo) throws Exception { //FOR BUSINESS VALIADATION
+ * merchantWalletBusinessValidator.updateMerchantWalletValidation(merchantWallet
+ * ,mobileNo);
+ * 
+ * ElasticMerchantWallet elasticMerchantWallet =
+ * elasticMerchantWalletRepository.findById(mobileNo).get();
+ * 
+ * ElasticMerchantWallet newElasticMerchantWallet = new ElasticMerchantWallet(
+ * merchantWallet.getMobileNo(),elasticMerchantWallet.getBalance(),
+ * elasticMerchantWallet.getStatus(),
+ * elasticMerchantWallet.getMerchantWalletcreatedDate());
+ * 
+ * elasticMerchantWalletRepository.save(newElasticMerchantWallet);
+ * 
+ * MerchantWallet existMerchantWallet =
+ * merchantWalletRepository.findById(mobileNo).get();
+ * 
+ * MerchantWallet newMerchantWallet = new MerchantWallet(
+ * merchantWallet.getMobileNo(),existMerchantWallet.getBalance(),
+ * existMerchantWallet.getStatus(),
+ * existMerchantWallet.getMerchantWalletcreatedDate());
+ * 
+ * merchantWalletRepository.save( newMerchantWallet);
+ * 
+ * }
+ */

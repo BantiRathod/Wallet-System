@@ -20,5 +20,9 @@ public interface TransactionRepository extends JpaRepository<WalletTransaction,L
 	  Page<WalletTransaction> findAllByPayerNo(@Param("payerNo") String payerNo, Pageable pageable);
 
 	  @Query("Select t from WalletTransaction t where (t.payeeMobileNo= :mobileNo) and (t.transactionDate between :startDate and :endDate)")
-	  List<WalletTransaction> getMerchantTransaction(@Param("mobileNo") String mobileNo, @Param("startDate") Date startDate, @Param("endDate") Date endDate);	 
+	  List<WalletTransaction> getMerchantTransaction(@Param("mobileNo") String mobileNo, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+	  
+	  @Query("Select t from WalletTransaction t where t.payerMobileNo = :mobileNo or t.payeeMobileNo = :mobileNo")            
+	  List<WalletTransaction> getTransactionByMobile(@Param("mobileNo") String mobileNo);	 
 }

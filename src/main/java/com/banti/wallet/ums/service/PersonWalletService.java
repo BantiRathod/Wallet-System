@@ -16,16 +16,16 @@ import com.banti.wallet.ums.model.BaseWallet;
 import com.banti.wallet.ums.model.PersonWallet;
 import com.banti.wallet.ums.repository.PersonWalletRepository;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
-import com.banti.wallet.ums.validator.business.PersonWalletBusinessValidator;
+//import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
+//import com.banti.wallet.ums.validator.business.PersonWalletBusinessValidator;
 
 @Service(value="personWalletService")
 @Transactional
 public class PersonWalletService implements MoneyMovementService { 
 	Logger logger=LoggerFactory.getLogger(PersonWalletService.class);
 	
-	@Autowired
-	private PersonWalletBusinessValidator personWalletBusinessValidator;
+//	@Autowired
+//	private PersonWalletBusinessValidator personWalletBusinessValidator;
 	
 	@Autowired
 	private ElasticPersonWalletRepository elasticPersonWalletRepository;
@@ -78,25 +78,7 @@ public class PersonWalletService implements MoneyMovementService {
 	}
 	
 	
-	public void updatePersonWallet(UpdatePersonWalletRequest wallet, String mobileNo) throws Exception
-	{
-		personWalletBusinessValidator.updatePersonWalletValidatoion(wallet,mobileNo);
-		
-	   	 PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
-	   	 
-		 PersonWallet newPersonWallet = new  PersonWallet(wallet.getMobileNo(), personWallet.getBalance(), personWallet.getStatus(),
-				 personWallet.getCreatedDate());
-		 
-	     //SAVE NEW PRESON WALLET OBJECT
-		 personWalletRepository.save(newPersonWallet);
-		
-		 ElasticPersonWallet elasticPersonWallet = elasticPersonWalletRepository.findById(mobileNo).get();
-		 
-		 ElasticPersonWallet newElasticPersonWallet = new  ElasticPersonWallet(wallet.getMobileNo(), elasticPersonWallet.getBalance(), elasticPersonWallet.getStatus(),
-				 elasticPersonWallet.getCreatedDate());
-		 //SAVE NEW PRESON WALLET OBJECT
-		 elasticPersonWalletRepository.save(newElasticPersonWallet);
-	}
+	
 	
 // rename user wallet to person wallet
 	@Override
@@ -133,6 +115,27 @@ public class PersonWalletService implements MoneyMovementService {
 		return updatedWallet;
 	}
 
-
-
 }
+
+/*
+ * public void updatePersonWallet(UpdatePersonWalletRequest wallet, String
+ * mobileNo) throws Exception {
+ * personWalletBusinessValidator.updatePersonWalletValidatoion(wallet,mobileNo);
+ * 
+ * PersonWallet personWallet = personWalletRepository.findById(mobileNo).get();
+ * 
+ * PersonWallet newPersonWallet = new PersonWallet(wallet.getMobileNo(),
+ * personWallet.getBalance(), personWallet.getStatus(),
+ * personWallet.getCreatedDate());
+ * 
+ * //SAVE NEW PRESON WALLET OBJECT personWalletRepository.save(newPersonWallet);
+ * 
+ * ElasticPersonWallet elasticPersonWallet =
+ * elasticPersonWalletRepository.findById(mobileNo).get();
+ * 
+ * ElasticPersonWallet newElasticPersonWallet = new
+ * ElasticPersonWallet(wallet.getMobileNo(), elasticPersonWallet.getBalance(),
+ * elasticPersonWallet.getStatus(), elasticPersonWallet.getCreatedDate());
+ * //SAVE NEW PRESON WALLET OBJECT
+ * elasticPersonWalletRepository.save(newElasticPersonWallet); }
+ */

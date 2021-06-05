@@ -17,7 +17,7 @@ public class PayoutController {
 	   return payoutService.fatchAllPayouts();
 	}
 	
-	@GetMapping("/payout/{payoutId}")
+	@GetMapping("/payout/{id}")
 	public ElasticPayout getPayout(@PathVariable Long id)
 	{
 	   return payoutService.fatchPayout(id);

@@ -8,7 +8,7 @@ public class MerchantRequest {
 	private String address;
 	private String email;
 	private String mobileNo;
-	private String password;
+	
 	public String getShopName() {
 		return shopName;
 	}
@@ -33,16 +33,11 @@ public class MerchantRequest {
 	public void setMobileNo(String mobileNo) {
 		this.mobileNo = mobileNo;
 	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
+
 	
 	@Override
 	public String toString() {
 		return "MerchantRequest [shopName=" + shopName + ", address=" + address + ", email=" + email + ", mobileNo="
-				+ mobileNo + ", password=" + password + "]";
+				+ mobileNo + "]";
 	}
 }

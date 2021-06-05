@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.banti.wallet.ums.controller.MerchantController;
+//import com.banti.wallet.ums.controller.MerchantController;
 import com.banti.wallet.ums.model.MerchantWallet;
 import com.banti.wallet.ums.repository.MerchantWalletRepository;
 import com.banti.wallet.ums.requestEntities.MerchantWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
+//import com.banti.wallet.ums.requestEntities.UpdateMerchantWalletRequest;
 
 
 @Service
@@ -36,11 +36,11 @@ public class MerchantWalletBusinessValidator {
 	}
 	
 	
-	public void updateMerchantWalletValidation(UpdateMerchantWalletRequest merchantWallet, String mobileNo) throws Exception {
+	/*public void updateMerchantWalletValidation(UpdateMerchantWalletRequest merchantWallet, String mobileNo) throws Exception {
 		MerchantWallet existmerchantWallet = merchantWalletRepository.findById(mobileNo).get();
 		
 		 if(existmerchantWallet==null)
-		    	 throw new Exception("account not opened yet by this mobile number");
+		    	 throw new Exception("account not opened yet by this mobile number");*/
 		
-	}
+	
 }

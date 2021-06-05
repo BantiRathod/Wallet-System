@@ -18,7 +18,8 @@ import java.util.NoSuchElementException;
 
 //Controller class, TO HANDLE ALL REQUESTS RELATED TO PERSON RECORDS, MARKED WITH RESTCONTROLLER.
 //To HANDLE ALL REQUEST RELATED TO PERSON, PERSONCONTROLLER CLASS CREATED
-@RestController                                                                   
+@RestController  
+@CrossOrigin(origins={ "http://localhost:3000"})
 public class PersonController 
 {       
 	// LOGGER IS USED TO PRINT THE VALUE OF VARIABLE LIKE SYSTEM.OUT.PRINTLN METHOD, BUT IT ALSO PRINT DATE, TIME , CLASS WITH PACKAGE THAT HELPS IN TRACING. 
@@ -133,7 +134,7 @@ public class PersonController
 	     try
 	     {   
 	    	 //TO CHECK WETHER PASSED PARAMETERS ARE VALID OR NOT
-	    	 personRequestBodyValidator.personRequestBodyAndIdValidation(person,id);
+	    	 personRequestBodyValidator.personRequestBodyAndIdValidation(id);
 	    	 
 	    	 logger.info("person received as a request body {}",person);
 	    	 

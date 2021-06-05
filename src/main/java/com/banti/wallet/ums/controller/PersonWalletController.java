@@ -7,21 +7,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banti.wallet.ums.elasticsearch.models.ElasticPersonWallet;
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
+//import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 import com.banti.wallet.ums.service.PersonWalletService;
 import com.banti.wallet.ums.validator.request.PersonWalletRequestBodyValidator;
 
 @RestController
+@CrossOrigin(origins={ "http://localhost:3000", "http://localhost" })
 public class PersonWalletController {
 	
 	Logger logger = LoggerFactory.getLogger(PersonWalletController.class);
@@ -57,6 +58,7 @@ public class PersonWalletController {
 		}	
 	}
 	
+	
 	/**
 	 *  THIS API IS REPONSIBLE FOR RETREIVING A WALLET OF REGISTERED PERSON.
 	 *  
@@ -77,7 +79,7 @@ public class PersonWalletController {
 		try
 		{   
 			//FOR MOBILE NUMBER VALIDATION
-			 personWalletRequestBodyValidator.personWalletMobileNoValidation(null , mobileNo);
+			 personWalletRequestBodyValidator.personWalletMobileNoValidation( mobileNo);
 			 
 	         ElasticPersonWallet existWallet = personWalletService.getPersonWallet(mobileNo);
 	         logger.info("reponsed person Wallet {}", existWallet);
@@ -87,6 +89,7 @@ public class PersonWalletController {
 			return new ResponseEntity<ElasticPersonWallet>(HttpStatus.NOT_FOUND);
 		}	
 	 }
+	
 	 
     /**
      * THIS API IS REPONSIBLE FOR CREATING A PERSON WALLET OF REGISTERED PERSON.
@@ -117,33 +120,6 @@ public class PersonWalletController {
 	
 	
 	/**
-     * THIS API IS REPONSIBLE FOR UPDATING A PERSON WALLET OF REGISTERED PERSON.
-	 *  
-	 * @param personWallet AND mobileNo ARE PARAMETERS TYPE OF RESPECTIVLY UpdatePersonWalletRequest AND String PASSED WHILE MAKING REQUEST BY USER.
-	 * FIELDS OR VARIABLES OF UpdatePersonWalletRequest{ mobileNo }
-	 * 
-	 * personWalletMobileNoValidation METHOD WILL VALIDATE PASSED personWallet and string IF THEY ARE VALID THEN INVOKE METHOD OF...
-	 * SERVICE LAYER CLASS FOR UPDATING PERSON WALLET OTHERWISE THROW AN EXCEPTION.  
-	 * 
-	 * @return STRING WOULD BE RETURN IF SUCCESSFULLY UPDATED, ELSE RETURN EXCEPTION'S MESSAGE.   
-     */
-	@PutMapping("/personWallet/{mobileNo}")
-	public ResponseEntity<String> updatePersonWallet(@RequestBody UpdatePersonWalletRequest personWallet, @PathVariable String mobileNo)
-	{
-		try
-		{
-		  // TO VALIDATE NEW passed MOBILENO
-		  personWalletRequestBodyValidator.personWalletMobileNoValidation(personWallet,mobileNo);
-		  personWalletService.updatePersonWallet(personWallet, mobileNo);
-		  return new ResponseEntity<String>(" person wallet updated successfully, by new mmobile no: "+personWallet.getMobileNo(),HttpStatus.OK);
-	 }catch(Exception e)
-		{
-		  return new ResponseEntity<>("Exception occured, "+e.getMessage(),HttpStatus.OK);
-		}
-	}
-	
-
-	/**
      * THIS API IS REPONSIBLE FOR DELETING A PERSON WALLET OF REGISTERED PERSON.
 	 *  
 	 * @param mobileNo IS A PARAMETER SENT BY USER WHILE MAKING REQUEST.
@@ -159,7 +135,7 @@ public class PersonWalletController {
 		try
 		{
 		  // TO VALIDATE NEW passed MOBILENO
-		  personWalletRequestBodyValidator.personWalletMobileNoValidation(null,mobileNo);
+		  personWalletRequestBodyValidator.personWalletMobileNoValidation(mobileNo);
 		  
 		  personWalletService.deletePersonWallet(mobileNo);
 		  return new ResponseEntity<String>(" person wallet deletd successfully, of this mobile no: "+ mobileNo,HttpStatus.OK);
@@ -169,3 +145,29 @@ public class PersonWalletController {
 	}
 	
 }
+
+/**
+ * THIS API IS REPONSIBLE FOR UPDATING A PERSON WALLET OF REGISTERED PERSON.
+ *  
+ * @param personWallet AND mobileNo ARE PARAMETERS TYPE OF RESPECTIVLY UpdatePersonWalletRequest AND String PASSED WHILE MAKING REQUEST BY USER.
+ * FIELDS OR VARIABLES OF UpdatePersonWalletRequest{ mobileNo }
+ * 
+ * personWalletMobileNoValidation METHOD WILL VALIDATE PASSED personWallet and string IF THEY ARE VALID THEN INVOKE METHOD OF...
+ * SERVICE LAYER CLASS FOR UPDATING PERSON WALLET OTHERWISE THROW AN EXCEPTION.  
+ * 
+ * @return STRING WOULD BE RETURN IF SUCCESSFULLY UPDATED, ELSE RETURN EXCEPTION'S MESSAGE.   
+ */
+//                  *** DON'T NEED TO UPADTE MOBILE NO.****
+
+/*
+ * @PutMapping("/personWallet/{mobileNo}") public ResponseEntity<String>
+ * updatePersonWallet(@RequestBody UpdatePersonWalletRequest
+ * personWallet, @PathVariable String mobileNo) { try { // TO VALIDATE NEW
+ * passed MOBILENO
+ * personWalletRequestBodyValidator.personWalletMobileNoValidation(personWallet,
+ * mobileNo); personWalletService.updatePersonWallet(personWallet, mobileNo);
+ * return new ResponseEntity<String>
+ * (" person wallet updated successfully, by new mmobile no: "+personWallet.
+ * getMobileNo(),HttpStatus.OK); }catch(Exception e) { return new
+ * ResponseEntity<>("Exception occured, "+e.getMessage(),HttpStatus.OK); } }
+ */

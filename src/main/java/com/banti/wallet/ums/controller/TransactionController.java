@@ -2,6 +2,7 @@ package com.banti.wallet.ums.controller;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +35,7 @@ import com.banti.wallet.ums.service.TransactionService;
 import com.banti.wallet.ums.validator.request.TransactionRequestValidator;
 
 @RestController
+@CrossOrigin(origins={ "http://localhost:3000", "http://localhost" })
 public class TransactionController {
 	Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
@@ -95,8 +98,17 @@ public class TransactionController {
 			return new ResponseEntity<String>("Exception occured, "+e.getMessage(),HttpStatus.NOT_FOUND);
 		}
 	}
-
 	
+	
+	@GetMapping("/transactions/{mobileNo}")
+	public ResponseEntity<List<WalletTransaction>> getTransactionByMobileNo(@PathVariable String mobileNo) {
+		try {
+			List<WalletTransaction> transactios = transactionService.getTransaction(mobileNo);
+			return new ResponseEntity<List<WalletTransaction>>(transactios , HttpStatus.OK);
+		} catch (NoSuchElementException e) {
+			return new ResponseEntity<List<WalletTransaction>>(HttpStatus.NOT_FOUND);
+		}
+	}
 	 /**
      * THIS API IS RESPOMSIBLE FOR MAKING P2M TRANSACTION.
      * 
@@ -105,7 +117,7 @@ public class TransactionController {
      * 
      * @RequestBody => IT IS A ANNOTATION WHICH BINDS THE PASSED BODY WITH METHOD'S LOCAL OBJECT.
      * 
-     * PASSED REQUEST BODY parameters{ amount, payerMobileNo, payeeMobileNo}
+     * PASSED REQUEST BODY parameters{ amount, payerMobileNo, payeeMobileNo}   
      * 
      * p2mRequestValidator IS METHOD FOR CHECKING THAT WEATHER PASSED BODY'S PARAMETERS ARE VALID OR NOT, IF YES THEN 
      * SERVICE LAYER'S METHOD WOULD INVOKED FOR FURTHER PROCESS OTHER WISE THROW AN EXCEPTION.

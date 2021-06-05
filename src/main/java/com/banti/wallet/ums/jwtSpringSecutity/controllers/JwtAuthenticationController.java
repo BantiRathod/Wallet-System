@@ -21,7 +21,7 @@ import com.banti.wallet.ums.jwtSpringSecutity.models.JwtResponse;
 import com.banti.wallet.ums.jwtSpringSecutity.services.JwtUserDetailsService;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins={ "http://localhost:3000"})
 public class JwtAuthenticationController {
 	
     Logger logger = LoggerFactory.getLogger(JwtAuthenticationController.class);

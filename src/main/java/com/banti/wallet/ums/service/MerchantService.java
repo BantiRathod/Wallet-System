@@ -107,8 +107,8 @@ public class MerchantService
 		 newMerchant.setRegisterDate(tempmarchant.getRegisterDate());
 		 newMerchant.setStatus(tempmarchant.getStatus());
 		 newMerchant.setAddress(merchant.getAddress());
-		 newMerchant.setEmail(merchant.getEmail());
-		 newMerchant.setMobileNo(merchant.getMobileNo());
+		 newMerchant.setEmail(tempmarchant.getEmail());
+		 newMerchant.setMobileNo(tempmarchant.getMobileNo());
 		 newMerchant.setMerchantId(id);
 		 newMerchant.setShopName(merchant.getShopName());
 		 
@@ -117,8 +117,8 @@ public class MerchantService
 		//HERE WE WILL UPDATE ONLY THOSE FIELDS WHICH ARE UPDATABLE 
 		 ElasticMerchant elasticMerchant = new ElasticMerchant();
 		 elasticMerchant.setAddress(merchant.getAddress());
-		 elasticMerchant.setEmail(merchant.getEmail());
-		 elasticMerchant.setMobileNo(merchant.getMobileNo());
+		 elasticMerchant.setEmail(tempmarchant.getEmail());
+		 elasticMerchant.setMobileNo(tempmarchant.getMobileNo());
          elasticMerchant.setMerchantId(id);
          elasticMerchant.setRegisterDate( tempmarchant.getRegisterDate());
          elasticMerchant.setStatus(tempmarchant.getStatus());

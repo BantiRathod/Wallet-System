@@ -3,7 +3,7 @@ package com.banti.wallet.ums.validator.request;
 import org.springframework.stereotype.Service;
 
 import com.banti.wallet.ums.requestEntities.PersonWalletRequest;
-import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
+//import com.banti.wallet.ums.requestEntities.UpdatePersonWalletRequest;
 
 @Service
 public class PersonWalletRequestBodyValidator 
@@ -18,11 +18,9 @@ public class PersonWalletRequestBodyValidator
 			 throw new Exception("invalid mobile number , "+personWalletRequest.getMobileNo()) ;
 	}
 
-	public void personWalletMobileNoValidation(UpdatePersonWalletRequest personWallet, String mobileNo) throws Exception {
-		   if((personWallet!=null) && personWallet.getMobileNo().length()!=10)
-	        	 throw new Exception("\"invalid mobile number ,"+ personWallet.getMobileNo());
-		   else if(mobileNo.length()!=10)
-			   throw new Exception("\"invalid mobile number ,"+ personWallet.getMobileNo());
-			      
+	public void personWalletMobileNoValidation(String mobileNo) throws Exception {
+		  if(mobileNo.length()!=10)
+			   throw new Exception("\"invalid mobile number ,"+ mobileNo);
 	}
+			      
 }

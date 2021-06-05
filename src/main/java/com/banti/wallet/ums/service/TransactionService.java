@@ -288,5 +288,10 @@ public class TransactionService
 		
 		return transactionrepository.getMerchantTransaction(mobileNo, startDate, endDate);
 	}
+
+	public 	List<WalletTransaction> getTransaction(String mobileNo) {
+		       
+		return transactionrepository.getTransactionByMobile(mobileNo) ;
+	}
 	
 }
